@@ -4,9 +4,11 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Car, MapPin, Activity, AlertTriangle } from 'lucide-react';
+import { Car, MapPin, Activity, AlertTriangle, Bell } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import AlertSettingsDialog, { AlertSettings } from './AlertSettingsDialog';
+import { sendEmailAlert } from '@/utils/alertUtils';
 
 interface Driver {
   id: number;
@@ -22,6 +24,17 @@ const LiveDrivers = () => {
   const [loading, setLoading] = useState(true);
   const [criticalAlerts, setCriticalAlerts] = useState<Driver[]>([]);
   const { toast } = useToast();
+  
+  // Alert settings state
+  const [alertSettings, setAlertSettings] = useState<AlertSettings>({
+    enabled: false,
+    emailAddress: '',
+    sendSMS: false,
+    phoneNumber: '',
+  });
+  
+  // State to track if alert is being sent
+  const [sendingAlert, setSendingAlert] = useState(false);
 
   // Simulate fetching live driver data
   useEffect(() => {
@@ -118,13 +131,44 @@ const LiveDrivers = () => {
     setCriticalAlerts(criticalDrivers);
   }, [drivers]);
 
-  const handleCriticalAlert = (driver: Driver) => {
+  const handleCriticalAlert = async (driver: Driver) => {
     // Display a toast notification
     toast({
       title: "CRITICAL ALERT!",
       description: `${driver.name} is in critical condition at ${driver.location}`,
       variant: "destructive",
     });
+    
+    // Send email alert if enabled
+    if (alertSettings.enabled && alertSettings.emailAddress) {
+      setSendingAlert(true);
+      
+      try {
+        const success = await sendEmailAlert({
+          driverName: driver.name,
+          location: driver.location,
+          timestamp: new Date().toLocaleString(),
+          status: driver.status
+        }, alertSettings.emailAddress);
+        
+        if (success) {
+          toast({
+            title: "Alert Email Sent",
+            description: `Notification sent to ${alertSettings.emailAddress}`,
+          });
+        } else {
+          toast({
+            title: "Failed to Send Alert",
+            description: "Could not send email notification",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error sending alert:", error);
+      } finally {
+        setSendingAlert(false);
+      }
+    }
     
     // In a real app, this would trigger an email/SMS notification
     console.log(`Email notification would be sent for ${driver.name} in critical condition`);
@@ -157,6 +201,24 @@ const LiveDrivers = () => {
     }
   };
 
+  const handleSaveAlertSettings = (newSettings: AlertSettings) => {
+    setAlertSettings(newSettings);
+    // In a real app, you'd save these settings to storage or user preferences
+    localStorage.setItem('driveSightAlertSettings', JSON.stringify(newSettings));
+  };
+
+  // Load saved settings if available
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('driveSightAlertSettings');
+    if (savedSettings) {
+      try {
+        setAlertSettings(JSON.parse(savedSettings));
+      } catch (e) {
+        console.error("Failed to parse saved alert settings");
+      }
+    }
+  }, []);
+
   if (loading) {
     return (
       <Card>
@@ -184,9 +246,15 @@ const LiveDrivers = () => {
               </Badge>
             )}
             <Badge className="bg-green-500">{drivers.filter(d => d.status === 'active').length} Active</Badge>
-            <Button variant="outline" size="sm" onClick={simulateCriticalCondition}>
-              Test Alert
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={simulateCriticalCondition}>
+                Test Alert
+              </Button>
+              <AlertSettingsDialog 
+                onSave={handleSaveAlertSettings} 
+                currentSettings={alertSettings} 
+              />
+            </div>
           </div>
         </div>
       </CardHeader>
