@@ -47,13 +47,23 @@ const AlertSettingsDialog = ({ onSave, currentSettings }: AlertSettingsDialogPro
     onSave(settings);
     setOpen(false);
     
-    toast({
-      title: "Settings Saved",
-      description: settings.enabled 
-        ? "Critical alerts will be sent to your email" 
-        : "Alert notifications are disabled",
-      icon: settings.enabled ? <MailCheck className="h-4 w-4" /> : undefined
-    });
+    if (settings.enabled) {
+      toast({
+        title: "Settings Saved",
+        description: "Critical alerts will be sent to your email",
+      });
+      // Render the icon separately instead of passing it as a property
+      setTimeout(() => {
+        document.querySelector('.toast-icon')?.appendChild(
+          document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+        );
+      }, 0);
+    } else {
+      toast({
+        title: "Settings Saved",
+        description: "Alert notifications are disabled",
+      });
+    }
   };
 
   return (
