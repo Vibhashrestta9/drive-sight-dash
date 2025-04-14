@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Car, MapPin, Activity, AlertTriangle, Bell } from 'lucide-react';
+import { MapPin, Activity, AlertTriangle, Bell } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import AlertSettingsDialog, { AlertSettings } from './AlertSettingsDialog';
@@ -24,7 +24,6 @@ const LiveDrivers = () => {
   const [criticalAlerts, setCriticalAlerts] = useState<Driver[]>([]);
   const { toast } = useToast();
   
-  // Alert settings state
   const [alertSettings, setAlertSettings] = useState<AlertSettings>({
     enabled: false,
     emailAddress: '',
@@ -32,71 +31,58 @@ const LiveDrivers = () => {
     phoneNumber: '',
   });
   
-  // State to track if alert is being sent
   const [sendingAlert, setSendingAlert] = useState(false);
 
-  // Simulate fetching live driver data
   useEffect(() => {
-    // Updated initial drivers with new names
     const initialDrivers: Driver[] = [
       { 
         id: 1, 
-        name: 'GIRISHA', 
+        name: 'GIRISHA CD', 
         status: 'active', 
         location: 'Downtown', 
         lastUpdate: '2 min ago',
-        avatar: 'G'
+        avatar: 'GC'
       },
       { 
         id: 2, 
-        name: 'CD ANANTH', 
+        name: 'MOHAN', 
         status: 'active', 
         location: 'Highway 101', 
         lastUpdate: '5 min ago',
-        avatar: 'CA'
+        avatar: 'M'
       },
       { 
         id: 3, 
-        name: 'N BABITHA', 
+        name: 'BABITHA', 
         status: 'idle', 
         location: 'Central Park', 
         lastUpdate: '10 min ago',
-        avatar: 'NB'
+        avatar: 'B'
       },
       { 
         id: 4, 
-        name: 'CHANDRAKALA', 
+        name: 'ANATH N', 
         status: 'offline', 
         location: 'Last: Airport Rd', 
         lastUpdate: '1 hour ago',
-        avatar: 'C'
+        avatar: 'AN'
       },
       { 
         id: 5, 
-        name: 'VIBHA', 
+        name: 'VIBHA SHRESTTA', 
         status: 'active', 
         location: 'Main Street', 
         lastUpdate: '4 min ago',
-        avatar: 'V'
-      },
-      { 
-        id: 6, 
-        name: 'SHRESTTA MOHAN', 
-        status: 'active', 
-        location: 'Riverside Drive', 
-        lastUpdate: '3 min ago',
-        avatar: 'SM'
+        avatar: 'VS'
       }
     ];
-    
+
     setDrivers(initialDrivers);
     setLoading(false);
 
-    // Simulate live updates
     const interval = setInterval(() => {
       setDrivers(prevDrivers => {
         return prevDrivers.map(driver => {
-          // Randomly update some drivers' status and location
           if (Math.random() > 0.7) {
             const statuses: ('active' | 'idle' | 'offline' | 'critical')[] = ['active', 'idle', 'offline', 'critical'];
             const locations = ['Downtown', 'Highway 101', 'Main Street', 'Broadway', 'Riverside Drive', 'Market Street'];
@@ -105,7 +91,6 @@ const LiveDrivers = () => {
             const timeUpdates = ['Just now', '1 min ago', '2 min ago', '5 min ago'];
             const randomTime = timeUpdates[Math.floor(Math.random() * timeUpdates.length)];
             
-            // If the status changes to critical, add to alerts
             if (randomStatus === 'critical' && driver.status !== 'critical') {
               const updatedDriver = {
                 ...driver,
@@ -132,21 +117,18 @@ const LiveDrivers = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Monitor drivers for critical status
   useEffect(() => {
     const criticalDrivers = drivers.filter(driver => driver.status === 'critical');
     setCriticalAlerts(criticalDrivers);
   }, [drivers]);
 
   const handleCriticalAlert = async (driver: Driver) => {
-    // Display a toast notification
     toast({
       title: "CRITICAL ALERT!",
       description: `${driver.name} is in critical condition at ${driver.location}`,
       variant: "destructive",
     });
     
-    // Send email alert if enabled
     if (alertSettings.enabled && alertSettings.emailAddress) {
       setSendingAlert(true);
       
@@ -177,7 +159,6 @@ const LiveDrivers = () => {
       }
     }
     
-    // In a real app, this would trigger an email/SMS notification
     console.log(`Email notification would be sent for ${driver.name} in critical condition`);
   };
 
@@ -210,11 +191,9 @@ const LiveDrivers = () => {
 
   const handleSaveAlertSettings = (newSettings: AlertSettings) => {
     setAlertSettings(newSettings);
-    // In a real app, you'd save these settings to storage or user preferences
     localStorage.setItem('driveSightAlertSettings', JSON.stringify(newSettings));
   };
 
-  // Load saved settings if available
   useEffect(() => {
     const savedSettings = localStorage.getItem('driveSightAlertSettings');
     if (savedSettings) {

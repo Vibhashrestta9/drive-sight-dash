@@ -20,12 +20,11 @@ const DriverPerformance = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Updated driver data with new names
     const driverData: DriverData[] = [
       {
         id: 1,
-        name: 'GIRISHA',
-        avatar: 'G',
+        name: 'GIRISHA CD',
+        avatar: 'GC',
         safetyScore: 92,
         avgSpeed: 34,
         distanceDriven: 152,
@@ -33,8 +32,8 @@ const DriverPerformance = () => {
       },
       {
         id: 2,
-        name: 'CD ANANTH',
-        avatar: 'CA',
+        name: 'MOHAN',
+        avatar: 'M',
         safetyScore: 88,
         avgSpeed: 38,
         distanceDriven: 134,
@@ -42,8 +41,8 @@ const DriverPerformance = () => {
       },
       {
         id: 3,
-        name: 'N BABITHA',
-        avatar: 'NB',
+        name: 'BABITHA',
+        avatar: 'B',
         safetyScore: 74,
         avgSpeed: 42,
         distanceDriven: 98,
@@ -51,8 +50,8 @@ const DriverPerformance = () => {
       },
       {
         id: 4,
-        name: 'CHANDRAKALA',
-        avatar: 'C',
+        name: 'ANATH N',
+        avatar: 'AN',
         safetyScore: 65,
         avgSpeed: 45,
         distanceDriven: 76,
@@ -60,32 +59,21 @@ const DriverPerformance = () => {
       },
       {
         id: 5,
-        name: 'VIBHA',
-        avatar: 'V',
+        name: 'VIBHA SHRESTTA',
+        avatar: 'VS',
         safetyScore: 95,
         avgSpeed: 32,
         distanceDriven: 186,
         status: 'excellent'
-      },
-      {
-        id: 6,
-        name: 'SHRESTTA MOHAN',
-        avatar: 'SM',
-        safetyScore: 82,
-        avgSpeed: 37,
-        distanceDriven: 124,
-        status: 'good'
       }
     ];
 
     setDrivers(driverData);
     setLoading(false);
 
-    // Simulate occasional updates to driver data
     const interval = setInterval(() => {
       setDrivers(prevDrivers => {
         return prevDrivers.map(driver => {
-          // Only update some drivers sometimes
           if (Math.random() > 0.7) {
             const newSafetyScore = Math.min(100, Math.max(50, driver.safetyScore + (Math.random() * 6 - 3)));
             const newAvgSpeed = Math.max(25, Math.min(50, driver.avgSpeed + (Math.random() * 4 - 2)));
