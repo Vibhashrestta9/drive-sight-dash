@@ -4,6 +4,7 @@ import DriveMetricsCards from '@/components/DriveMetricsCards';
 import PerformanceGraph from '@/components/PerformanceGraph';
 import LiveDrivers from '@/components/LiveDrivers';
 import DriverPerformance from '@/components/DriverPerformance';
+import RMDEDashboard from '@/components/RMDEDashboard';
 
 const Index = () => {
   return (
@@ -26,6 +27,11 @@ const Index = () => {
           <div className="grid grid-cols-1 gap-6">
             <LiveDrivers />
           </div>
+        </div>
+
+        {/* RMDE Dashboard Section */}
+        <div className="mt-6">
+          <RMDEDashboard />
         </div>
 
         {/* Driver Performance Section */}
