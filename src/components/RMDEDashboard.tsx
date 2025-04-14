@@ -1,9 +1,17 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { 
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { 
   Tabs, 
   TabsContent, 
@@ -35,20 +43,29 @@ import {
   ActivityIcon,
   ServerIcon,
   HistoryIcon,
-  RefreshCwIcon 
+  RefreshCwIcon,
+  WifiIcon,
+  DropletIcon,
+  MonitorIcon
 } from 'lucide-react';
 import { 
   RMDEDrive, 
   RMDEError, 
+  RMDEModule,
+  RMDESystemStatus,
   generateInitialRMDEData, 
   updateRMDEData, 
   getStatusBadgeClass,
-  getHealthColor 
+  getHealthColor,
+  generateNETAModules,
+  generateRMDESystemStatus
 } from '@/utils/rmdeUtils';
 
 const RMDEDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [rmdeData, setRmdeData] = useState<RMDEDrive[]>([]);
+  const [netaModules, setNetaModules] = useState<RMDEModule[]>([]);
+  const [rmdeSystemStatus, setRmdeSystemStatus] = useState<RMDESystemStatus[]>([]);
   const [loading, setLoading] = useState(true);
   const [criticalErrors, setCriticalErrors] = useState<{drive: RMDEDrive, error: RMDEError}[]>([]);
   const { toast } = useToast();
@@ -56,7 +73,11 @@ const RMDEDashboard = () => {
   useEffect(() => {
     // Initialize data
     const data = generateInitialRMDEData();
+    const modules = generateNETAModules();
+    const systemStatus = generateRMDESystemStatus();
     setRmdeData(data);
+    setNetaModules(modules);
+    setRmdeSystemStatus(systemStatus);
     setLoading(false);
     
     // Check for critical errors in initial data
@@ -69,6 +90,12 @@ const RMDEDashboard = () => {
         checkForCriticalErrors(updatedData);
         return updatedData;
       });
+      
+      // Update NETA modules and RMDE system status occasionally
+      if (Math.random() > 0.7) {
+        setNetaModules(generateNETAModules());
+        setRmdeSystemStatus(generateRMDESystemStatus());
+      }
     }, 5000);
 
     return () => clearInterval(interval);
@@ -170,7 +197,11 @@ const RMDEDashboard = () => {
     setLoading(true);
     setTimeout(() => {
       const newData = generateInitialRMDEData();
+      const newModules = generateNETAModules();
+      const newSystemStatus = generateRMDESystemStatus();
       setRmdeData(newData);
+      setNetaModules(newModules);
+      setRmdeSystemStatus(newSystemStatus);
       setLoading(false);
       toast({
         title: "Data Refreshed",
@@ -216,6 +247,7 @@ const RMDEDashboard = () => {
           <TabsList className="mb-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="modules">NETA-21 Modules</TabsTrigger>
+            <TabsTrigger value="rmde-monitor">RMDE Monitor</TabsTrigger>
             <TabsTrigger value="errors">Error Log</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
@@ -417,6 +449,128 @@ const RMDEDashboard = () => {
                 </CardContent>
               </Card>
             ))}
+          </TabsContent>
+          
+          {/* RMDE Monitor Tab - New Tab */}
+          <TabsContent value="rmde-monitor" className="space-y-4">
+            {/* RMDE System Status Cards */}
+            <div className="grid grid-cols-1 gap-4">
+              {rmdeSystemStatus.map(system => (
+                <Card key={system.id} className={system.status === 'warning' ? 'border-yellow-400' : system.status === 'critical' ? 'border-red-500' : ''}>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <MonitorIcon className={system.status === 'warning' ? 'text-yellow-500' : system.status === 'critical' ? 'text-red-500' : 'text-green-500'} />
+                        <div>
+                          <CardTitle className="text-lg">{system.id}</CardTitle>
+                          <CardDescription>RMDE System Status</CardDescription>
+                        </div>
+                      </div>
+                      <Badge className={
+                        system.status === 'warning' ? 'bg-yellow-500' : 
+                        system.status === 'critical' ? 'bg-red-500' : 
+                        'bg-green-500'
+                      }>
+                        {system.status === 'warning' ? 'Warning' : 
+                         system.status === 'critical' ? 'Critical' : 
+                         'Normal'}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="flex items-center gap-2 p-3 rounded-md bg-gray-50 dark:bg-gray-900">
+                        <ThermometerIcon className="text-blue-500" />
+                        <div>
+                          <div className="text-sm text-muted-foreground">Temperature</div>
+                          <div className="font-semibold text-lg">{system.temperature}°C</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 p-3 rounded-md bg-gray-50 dark:bg-gray-900">
+                        <DropletIcon className="text-blue-500" />
+                        <div>
+                          <div className="text-sm text-muted-foreground">Humidity</div>
+                          <div className="font-semibold text-lg">{system.humidity}%</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-4">
+                      Last updated: {new Date(system.lastUpdated).toLocaleString()}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            {/* NETA-21 Modules Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle>NETA-21 Modules</CardTitle>
+                <CardDescription>Current status of all NETA-21 modules in the system</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>NETA ID</TableHead>
+                      <TableHead>IP Address</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Connected Drives</TableHead>
+                      <TableHead>Last Seen</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {netaModules.map(module => (
+                      <TableRow key={module.id}>
+                        <TableCell className="font-medium">{module.id}</TableCell>
+                        <TableCell>{module.ipAddress}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className={`h-2 w-2 rounded-full ${getStatusBadgeClass(module.status)}`}></div>
+                            <span className="capitalize">{module.status}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>{module.connectedDrives}</TableCell>
+                        <TableCell>{new Date(module.lastSeen).toLocaleString()}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+            
+            {/* Connected Drives by Module */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Connected Drives by Module</CardTitle>
+                <CardDescription>Overview of drives connected to each NETA-21 module</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[250px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={netaModules.map(module => ({
+                        name: module.id,
+                        drives: module.connectedDrives
+                      }))}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip 
+                        formatter={(value) => [`${value} drives`, 'Connected']}
+                        contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
+                      />
+                      <Bar 
+                        dataKey="drives" 
+                        fill="#9b87f5" 
+                        radius={[4, 4, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
           
           {/* Error Log Tab */}

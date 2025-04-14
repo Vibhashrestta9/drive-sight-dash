@@ -1,4 +1,3 @@
-
 interface RMDEDrive {
   id: number;
   name: string;
@@ -19,6 +18,22 @@ interface RMDEError {
   severity: 'low' | 'medium' | 'high' | 'critical';
   message: string;
   resolved: boolean;
+}
+
+interface RMDEModule {
+  id: string;
+  ipAddress: string;
+  status: 'online' | 'offline' | 'warning' | 'error';
+  connectedDrives: number;
+  lastSeen: string;
+}
+
+interface RMDESystemStatus {
+  id: string;
+  temperature: number;
+  humidity: number;
+  status: 'normal' | 'warning' | 'critical';
+  lastUpdated: string;
 }
 
 /**
@@ -165,4 +180,45 @@ export const getHealthColor = (score: number): string => {
   return 'bg-red-500';
 };
 
-export type { RMDEDrive, RMDEError };
+/**
+ * Generate mock NETA-21 modules data
+ */
+export const generateNETAModules = (): RMDEModule[] => {
+  const moduleIds = ['NETA-21-A', 'NETA-21-B', 'NETA-21-C'];
+  
+  return moduleIds.map((id, index) => {
+    const ipOctet = 100 + index;
+    return {
+      id,
+      ipAddress: `192.168.1.${ipOctet}`,
+      status: Math.random() > 0.8 ? 'warning' : 'online',
+      connectedDrives: Math.floor(Math.random() * 3) + 1,
+      lastSeen: new Date().toISOString()
+    };
+  });
+};
+
+/**
+ * Generate RMDE system status
+ */
+export const generateRMDESystemStatus = (): RMDESystemStatus[] => {
+  const rmdeIds = ['RMDE-001', 'RMDE-002'];
+  
+  return rmdeIds.map(id => {
+    const temp = Math.floor(Math.random() * 15) + 20; // 20-35°C
+    const humidity = Math.floor(Math.random() * 30) + 30; // 30-60%
+    
+    // Status based on temperature and humidity
+    const status = temp > 30 || humidity > 55 ? 'warning' : 'normal';
+    
+    return {
+      id,
+      temperature: temp,
+      humidity,
+      status,
+      lastUpdated: new Date().toISOString()
+    };
+  });
+};
+
+export type { RMDEDrive, RMDEError, RMDEModule, RMDESystemStatus };
