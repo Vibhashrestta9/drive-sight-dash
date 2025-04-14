@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -21,12 +20,12 @@ const DriverPerformance = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate data fetch
+    // Updated driver data with new names
     const driverData: DriverData[] = [
       {
         id: 1,
-        name: 'Alex Johnson',
-        avatar: 'AJ',
+        name: 'GIRISHA',
+        avatar: 'G',
         safetyScore: 92,
         avgSpeed: 34,
         distanceDriven: 152,
@@ -34,8 +33,8 @@ const DriverPerformance = () => {
       },
       {
         id: 2,
-        name: 'Sarah Williams',
-        avatar: 'SW',
+        name: 'CD ANANTH',
+        avatar: 'CA',
         safetyScore: 88,
         avgSpeed: 38,
         distanceDriven: 134,
@@ -43,8 +42,8 @@ const DriverPerformance = () => {
       },
       {
         id: 3,
-        name: 'Michael Chen',
-        avatar: 'MC',
+        name: 'N BABITHA',
+        avatar: 'NB',
         safetyScore: 74,
         avgSpeed: 42,
         distanceDriven: 98,
@@ -52,8 +51,8 @@ const DriverPerformance = () => {
       },
       {
         id: 4,
-        name: 'Rachel Green',
-        avatar: 'RG',
+        name: 'CHANDRAKALA',
+        avatar: 'C',
         safetyScore: 65,
         avgSpeed: 45,
         distanceDriven: 76,
@@ -61,8 +60,8 @@ const DriverPerformance = () => {
       },
       {
         id: 5,
-        name: 'David Lopez',
-        avatar: 'DL',
+        name: 'VIBHA',
+        avatar: 'V',
         safetyScore: 95,
         avgSpeed: 32,
         distanceDriven: 186,
@@ -70,8 +69,8 @@ const DriverPerformance = () => {
       },
       {
         id: 6,
-        name: 'Emma Thompson',
-        avatar: 'ET',
+        name: 'SHRESTTA MOHAN',
+        avatar: 'SM',
         safetyScore: 82,
         avgSpeed: 37,
         distanceDriven: 124,

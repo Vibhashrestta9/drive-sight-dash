@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,47 +37,55 @@ const LiveDrivers = () => {
 
   // Simulate fetching live driver data
   useEffect(() => {
-    // Initial data
+    // Updated initial drivers with new names
     const initialDrivers: Driver[] = [
       { 
         id: 1, 
-        name: 'Alex Johnson', 
+        name: 'GIRISHA', 
         status: 'active', 
         location: 'Downtown', 
         lastUpdate: '2 min ago',
-        avatar: 'AJ'
+        avatar: 'G'
       },
       { 
         id: 2, 
-        name: 'Sarah Williams', 
+        name: 'CD ANANTH', 
         status: 'active', 
         location: 'Highway 101', 
         lastUpdate: '5 min ago',
-        avatar: 'SW'
+        avatar: 'CA'
       },
       { 
         id: 3, 
-        name: 'Michael Chen', 
+        name: 'N BABITHA', 
         status: 'idle', 
         location: 'Central Park', 
         lastUpdate: '10 min ago',
-        avatar: 'MC'
+        avatar: 'NB'
       },
       { 
         id: 4, 
-        name: 'Rachel Green', 
+        name: 'CHANDRAKALA', 
         status: 'offline', 
         location: 'Last: Airport Rd', 
         lastUpdate: '1 hour ago',
-        avatar: 'RG'
+        avatar: 'C'
       },
       { 
         id: 5, 
-        name: 'David Lopez', 
+        name: 'VIBHA', 
         status: 'active', 
         location: 'Main Street', 
         lastUpdate: '4 min ago',
-        avatar: 'DL'
+        avatar: 'V'
+      },
+      { 
+        id: 6, 
+        name: 'SHRESTTA MOHAN', 
+        status: 'active', 
+        location: 'Riverside Drive', 
+        lastUpdate: '3 min ago',
+        avatar: 'SM'
       }
     ];
     
