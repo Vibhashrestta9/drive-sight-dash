@@ -46,19 +46,25 @@ import {
   RefreshCwIcon,
   WifiIcon,
   DropletIcon,
-  MonitorIcon
+  MonitorIcon,
+  GaugeIcon,
+  RotateCwIcon,
+  WrenchIcon
 } from 'lucide-react';
 import { 
   RMDEDrive, 
   RMDEError, 
   RMDEModule,
   RMDESystemStatus,
+  RMDEFault,
   generateInitialRMDEData, 
   updateRMDEData, 
   getStatusBadgeClass,
   getHealthColor,
   generateNETAModules,
-  generateRMDESystemStatus
+  generateRMDESystemStatus,
+  fetchDriveDataFromAPI,
+  sendEmailNotification
 } from '@/utils/rmdeUtils';
 
 const RMDEDashboard = () => {
@@ -68,6 +74,7 @@ const RMDEDashboard = () => {
   const [rmdeSystemStatus, setRmdeSystemStatus] = useState<RMDESystemStatus[]>([]);
   const [loading, setLoading] = useState(true);
   const [criticalErrors, setCriticalErrors] = useState<{drive: RMDEDrive, error: RMDEError}[]>([]);
+  const [apiPolling, setApiPolling] = useState<boolean>(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -101,6 +108,82 @@ const RMDEDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // New effect for API polling
+  useEffect(() => {
+    let apiPollInterval: number | null = null;
+    
+    if (apiPolling) {
+      // Start polling NETA-21 APIs for latest data
+      apiPollInterval = window.setInterval(async () => {
+        try {
+          for (const module of netaModules) {
+            if (module.apiStatus === 'connected') {
+              const apiData = await fetchDriveDataFromAPI(module.id);
+              
+              if (apiData.success) {
+                // Update drive data with values from API
+                setRmdeData(prevDrives => {
+                  return prevDrives.map(drive => {
+                    // Find matching drive from API response
+                    if (drive.moduleId === module.id) {
+                      const matchingApiDrive = apiData.drives.find(
+                        apiDrive => apiDrive.id === drive.id
+                      );
+                      
+                      if (matchingApiDrive) {
+                        // Merge API data with existing drive data
+                        return {
+                          ...drive,
+                          speed: matchingApiDrive.speed,
+                          temperature: matchingApiDrive.temperature,
+                          torque: matchingApiDrive.torque,
+                          faults: [...matchingApiDrive.faults],
+                          lastUpdated: apiData.timestamp
+                        };
+                      }
+                    }
+                    return drive;
+                  });
+                });
+                
+                // Show success toast occasionally
+                if (Math.random() > 0.9) {
+                  toast({
+                    title: "API Connection Active",
+                    description: `Successfully fetched latest data from ${module.id}`,
+                    variant: "default",
+                  });
+                }
+              } else {
+                // Show error toast
+                toast({
+                  title: "API Connection Error",
+                  description: `Failed to fetch data from ${module.id}`,
+                  variant: "destructive",
+                });
+                
+                // Update module status
+                setNetaModules(prev => 
+                  prev.map(m => 
+                    m.id === module.id ? { ...m, apiStatus: 'error' } : m
+                  )
+                );
+              }
+            }
+          }
+        } catch (error) {
+          console.error("API polling error:", error);
+        }
+      }, 10000); // Poll every 10 seconds
+    }
+    
+    return () => {
+      if (apiPollInterval) {
+        window.clearInterval(apiPollInterval);
+      }
+    };
+  }, [apiPolling, netaModules]);
+
   const checkForCriticalErrors = (data: RMDEDrive[]) => {
     const newCriticalErrors: {drive: RMDEDrive, error: RMDEError}[] = [];
     
@@ -113,7 +196,21 @@ const RMDEDashboard = () => {
           
           if (!existingError) {
             newCriticalErrors.push({drive, error});
+            
+            // Simulate sending email notification
+            sendEmailNotification(drive, error.message);
           }
+        }
+      });
+      
+      // Also check for critical faults
+      drive.faults.forEach(fault => {
+        if (fault.impact === 'critical') {
+          toast({
+            title: `Critical fault detected`,
+            description: `${drive.name}: ${fault.code} - ${fault.description}`,
+            variant: "destructive",
+          });
         }
       });
     });
@@ -210,6 +307,18 @@ const RMDEDashboard = () => {
     }, 500);
   };
 
+  const toggleApiPolling = () => {
+    setApiPolling(prev => !prev);
+    
+    toast({
+      title: apiPolling ? "API Connection Stopped" : "API Connection Started",
+      description: apiPolling ? 
+        "Disconnected from NETA-21 API endpoints" : 
+        "Connected to NETA-21 API endpoints for real-time data",
+      variant: "default",
+    });
+  };
+
   if (loading) {
     return (
       <Card>
@@ -231,15 +340,26 @@ const RMDEDashboard = () => {
             <CardTitle>RMDE System Monitor</CardTitle>
             <CardDescription>Real-time drive monitoring and error detection</CardDescription>
           </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex items-center gap-1"
-            onClick={refreshData}
-          >
-            <RefreshCwIcon size={14} />
-            Refresh Data
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant={apiPolling ? "default" : "secondary"}
+              size="sm" 
+              className="flex items-center gap-1"
+              onClick={toggleApiPolling}
+            >
+              <WifiIcon size={14} />
+              {apiPolling ? "Disconnect API" : "Connect API"}
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-1"
+              onClick={refreshData}
+            >
+              <RefreshCwIcon size={14} />
+              Refresh Data
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -418,6 +538,34 @@ const RMDEDashboard = () => {
                               <ClockIcon size={12} />
                               <span>{Math.floor(drive.operatingHours)}h Runtime</span>
                             </div>
+                            {/* New metrics */}
+                            <div className="flex items-center gap-1">
+                              <GaugeIcon size={12} />
+                              <span>{drive.speed} RPM</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <RotateCwIcon size={12} />
+                              <span>{drive.torque} Nm</span>
+                            </div>
+                          </div>
+                          
+                          {/* Active Faults */}
+                          {drive.faults.length > 0 && (
+                            <div className="mt-2 text-xs">
+                              <div className="flex items-center gap-1 text-red-500">
+                                <WrenchIcon size={12} />
+                                <span className="font-medium">Active Faults: {drive.faults.length}</span>
+                              </div>
+                              <div className="text-xs text-red-400 mt-1">
+                                {drive.faults[0].code}: {drive.faults[0].description}
+                                {drive.faults.length > 1 && `, +${drive.faults.length - 1} more`}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Last Updated */}
+                          <div className="mt-1 text-[10px] text-muted-foreground">
+                            Last updated: {new Date(drive.lastUpdated).toLocaleString()}
                           </div>
                         </div>
                         <div className="flex flex-col items-center">
@@ -451,7 +599,7 @@ const RMDEDashboard = () => {
             ))}
           </TabsContent>
           
-          {/* RMDE Monitor Tab - New Tab */}
+          {/* RMDE Monitor Tab */}
           <TabsContent value="rmde-monitor" className="space-y-4">
             {/* RMDE System Status Cards */}
             <div className="grid grid-cols-1 gap-4">
@@ -502,7 +650,7 @@ const RMDEDashboard = () => {
               ))}
             </div>
             
-            {/* NETA-21 Modules Table */}
+            {/* NETA-21 Modules Table with API Status */}
             <Card>
               <CardHeader>
                 <CardTitle>NETA-21 Modules</CardTitle>
@@ -516,6 +664,7 @@ const RMDEDashboard = () => {
                       <TableHead>IP Address</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Connected Drives</TableHead>
+                      <TableHead>API Status</TableHead>
                       <TableHead>Last Seen</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -531,6 +680,15 @@ const RMDEDashboard = () => {
                           </div>
                         </TableCell>
                         <TableCell>{module.connectedDrives}</TableCell>
+                        <TableCell>
+                          <Badge className={
+                            module.apiStatus === 'connected' ? 'bg-green-500' : 
+                            module.apiStatus === 'disconnected' ? 'bg-gray-500' : 
+                            'bg-red-500'
+                          }>
+                            {module.apiStatus}
+                          </Badge>
+                        </TableCell>
                         <TableCell>{new Date(module.lastSeen).toLocaleString()}</TableCell>
                       </TableRow>
                     ))}
@@ -628,124 +786,19 @@ const RMDEDashboard = () => {
                       </div>
                     ))}
                     
-                    {/* If no errors */}
-                    {rmdeData.flatMap(drive => drive.errors).length === 0 && (
-                      <div className="text-center p-8 text-muted-foreground">
-                        No errors recorded in the system
-                      </div>
-                    )}
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          {/* Analytics Tab */}
-          <TabsContent value="analytics" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance Metrics</CardTitle>
-                <CardDescription>RMDE system temperature and power analytics</CardDescription>
-              </CardHeader>
-              <CardContent className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={rmdeData.map(d => ({
-                      name: d.name,
-                      temperature: d.temperature,
-                      power: d.powerUsage,
-                      efficiency: d.efficiency
-                    }))}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="name" />
-                    <YAxis yAxisId="left" orientation="left" stroke="#2563eb" />
-                    <YAxis yAxisId="right" orientation="right" stroke="#10b981" />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px' }} 
-                    />
-                    <Line 
-                      yAxisId="left"
-                      type="monotone" 
-                      dataKey="temperature" 
-                      stroke="#2563eb" 
-                      strokeWidth={2}
-                      name="Temperature (°C)"
-                      dot={{ r: 4 }}
-                      activeDot={{ r: 6 }}
-                    />
-                    <Line 
-                      yAxisId="right"
-                      type="monotone" 
-                      dataKey="power" 
-                      stroke="#10b981" 
-                      strokeWidth={2}
-                      name="Power (W)"
-                      dot={{ r: 4 }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Efficiency Comparison</CardTitle>
-                </CardHeader>
-                <CardContent className="h-[200px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={rmdeData.map(d => ({
-                        name: d.name,
-                        efficiency: d.efficiency,
-                        healthScore: d.healthScore
-                      }))}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                      <XAxis dataKey="name" />
-                      <YAxis domain={[0, 100]} />
-                      <Tooltip 
-                        formatter={(value) => [`${value}%`, 'Efficiency']}
-                        contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
-                      />
-                      <Bar dataKey="efficiency" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Operating Hours</CardTitle>
-                </CardHeader>
-                <CardContent className="h-[200px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={rmdeData.map(d => ({
-                        name: d.name,
-                        hours: Math.floor(d.operatingHours)
-                      }))}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip 
-                        formatter={(value) => [`${value} hours`, 'Operating Time']}
-                        contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
-                      />
-                      <Bar dataKey="hours" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
-  );
-};
-
-export default RMDEDashboard;
+                    {/* Active Faults Section */}
+                    <div className="mt-6">
+                      <h3 className="font-medium mb-2">Active Faults</h3>
+                      <div className="space-y-2">
+                        {rmdeData.flatMap(drive => 
+                          drive.faults.map(fault => ({drive, fault}))
+                        ).sort((a, b) => 
+                          new Date(b.fault.timeDetected).getTime() - new Date(a.fault.timeDetected).getTime()
+                        ).map(({drive, fault}, index) => (
+                          <div 
+                            key={`fault-${drive.id}-${fault.id}-${index}`} 
+                            className={`p-3 rounded-lg border ${
+                              fault.impact === 'critical' ? 'bg-red-50 dark:bg-red-950/20' : 
+                              fault.impact === 'major' ? 'bg-orange-50 dark:bg-orange-950/20' : 
+                              fault.impact === 'minor' ? 'bg-yellow-50 dark:bg-yellow-950/20' : 
+                              'bg-blue-50 dark:bg-blue-950/20

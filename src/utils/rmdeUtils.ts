@@ -10,6 +10,10 @@ interface RMDEDrive {
   lastMaintenance: string;
   healthScore: number;
   errors: RMDEError[];
+  speed: number;
+  torque: number;
+  lastUpdated: string;
+  faults: RMDEFault[];
 }
 
 interface RMDEError {
@@ -20,12 +24,23 @@ interface RMDEError {
   resolved: boolean;
 }
 
+interface RMDEFault {
+  id: number;
+  code: string;
+  description: string;
+  timeDetected: string;
+  impact: 'none' | 'minor' | 'major' | 'critical';
+  requiresService: boolean;
+}
+
 interface RMDEModule {
   id: string;
   ipAddress: string;
   status: 'online' | 'offline' | 'warning' | 'error';
   connectedDrives: number;
   lastSeen: string;
+  apiEndpoint?: string;
+  apiStatus?: 'connected' | 'disconnected' | 'error';
 }
 
 interface RMDESystemStatus {
@@ -34,6 +49,18 @@ interface RMDESystemStatus {
   humidity: number;
   status: 'normal' | 'warning' | 'critical';
   lastUpdated: string;
+}
+
+interface RMDEApiResponse {
+  success: boolean;
+  timestamp: string;
+  drives: {
+    id: number;
+    speed: number;
+    temperature: number;
+    torque: number;
+    faults: RMDEFault[];
+  }[];
 }
 
 /**
@@ -63,7 +90,11 @@ export const generateInitialRMDEData = (): RMDEDrive[] => {
       efficiency: Math.floor(Math.random() * 20) + 80, // 80-100%
       lastMaintenance: new Date(Date.now() - Math.floor(Math.random() * 30) * 86400000).toLocaleDateString(), // Random date in last 30 days
       healthScore,
-      errors: generateRandomErrors(Math.floor(Math.random() * 4)) // 0-3 errors
+      errors: generateRandomErrors(Math.floor(Math.random() * 4)), // 0-3 errors
+      speed: Math.floor(Math.random() * 1000) + 1000, // 1000-2000 RPM
+      torque: Math.floor(Math.random() * 150) + 50, // 50-200 Nm
+      lastUpdated: new Date().toISOString(),
+      faults: generateRandomFaults(status !== 'online' ? Math.floor(Math.random() * 3) : 0) // 0-2 faults if not online
     };
   });
 };
@@ -76,11 +107,7 @@ const generateRandomErrors = (count: number): RMDEError[] => {
     'Temperature threshold exceeded',
     'Power fluctuation detected',
     'Drive communication timeout',
-    'Parameter drift outside normal range',
-    'Connection quality degraded',
-    'System resource limitation',
-    'Configuration mismatch detected',
-    'Operational anomaly detected'
+    'Parameter drift outside normal range'
   ];
   
   const errors: RMDEError[] = [];
@@ -99,6 +126,37 @@ const generateRandomErrors = (count: number): RMDEError[] => {
 };
 
 /**
+ * Generates random RMDE faults
+ */
+const generateRandomFaults = (count: number): RMDEFault[] => {
+  const faultDescriptions = [
+    { code: 'F001', desc: 'Drive temperature limit exceeded' },
+    { code: 'F002', desc: 'Torque fluctuation detected' },
+    { code: 'F003', desc: 'Speed irregularity' },
+    { code: 'F004', desc: 'Power input unstable' },
+    { code: 'F005', desc: 'Control module communication failure' },
+    { code: 'F006', desc: 'Sensor calibration required' },
+  ];
+  
+  const faults: RMDEFault[] = [];
+  for (let i = 0; i < count; i++) {
+    const faultInfo = faultDescriptions[Math.floor(Math.random() * faultDescriptions.length)];
+    const impact: ('none' | 'minor' | 'major' | 'critical')[] = ['none', 'minor', 'major', 'critical'];
+    
+    faults.push({
+      id: Date.now() + i,
+      code: faultInfo.code,
+      description: faultInfo.desc,
+      timeDetected: new Date(Date.now() - Math.floor(Math.random() * 24) * 3600000).toISOString(),
+      impact: impact[Math.floor(Math.random() * impact.length)],
+      requiresService: Math.random() > 0.5
+    });
+  }
+  
+  return faults;
+};
+
+/**
  * Updates RMDE data with simulated changes
  */
 export const updateRMDEData = (drives: RMDEDrive[]): RMDEDrive[] => {
@@ -108,6 +166,8 @@ export const updateRMDEData = (drives: RMDEDrive[]): RMDEDrive[] => {
       const temperatureChange = Math.random() * 4 - 2; // -2 to +2
       const powerChange = Math.random() * 20 - 10; // -10 to +10
       const efficiencyChange = Math.random() * 4 - 2; // -2 to +2
+      const speedChange = Math.random() * 100 - 50; // -50 to +50 RPM
+      const torqueChange = Math.random() * 20 - 10; // -10 to +10 Nm
       
       let newHealthScore = drive.healthScore + (Math.random() * 6 - 3); // -3 to +3
       newHealthScore = Math.max(0, Math.min(100, newHealthScore));
@@ -137,6 +197,20 @@ export const updateRMDEData = (drives: RMDEDrive[]): RMDEDrive[] => {
         });
       }
       
+      // Update faults occasionally
+      let newFaults = [...drive.faults];
+      
+      // Add a new fault on occasion
+      if (Math.random() > 0.95 && newStatus !== 'online') {
+        newFaults = [...newFaults, ...generateRandomFaults(1)];
+      }
+      
+      // Resolve some faults on occasion
+      if (Math.random() > 0.85 && newFaults.length > 0) {
+        const randomIndex = Math.floor(Math.random() * newFaults.length);
+        newFaults.splice(randomIndex, 1);
+      }
+      
       return {
         ...drive,
         temperature: Math.max(20, Math.min(80, drive.temperature + temperatureChange)),
@@ -145,7 +219,11 @@ export const updateRMDEData = (drives: RMDEDrive[]): RMDEDrive[] => {
         healthScore: Math.round(newHealthScore),
         status: newStatus as 'online' | 'offline' | 'warning' | 'error',
         operatingHours: drive.operatingHours + 0.01,
-        errors: newErrors
+        errors: newErrors,
+        speed: Math.max(800, Math.min(2200, drive.speed + speedChange)),
+        torque: Math.max(40, Math.min(220, drive.torque + torqueChange)),
+        lastUpdated: new Date().toISOString(),
+        faults: newFaults
       };
     }
     return drive;
@@ -193,7 +271,9 @@ export const generateNETAModules = (): RMDEModule[] => {
       ipAddress: `192.168.1.${ipOctet}`,
       status: Math.random() > 0.8 ? 'warning' : 'online',
       connectedDrives: Math.floor(Math.random() * 3) + 1,
-      lastSeen: new Date().toISOString()
+      lastSeen: new Date().toISOString(),
+      apiEndpoint: `https://api.neta.com/modules/${id.toLowerCase()}`,
+      apiStatus: Math.random() > 0.1 ? 'connected' : Math.random() > 0.5 ? 'disconnected' : 'error'
     };
   });
 };
@@ -221,4 +301,44 @@ export const generateRMDESystemStatus = (): RMDESystemStatus[] => {
   });
 };
 
-export type { RMDEDrive, RMDEError, RMDEModule, RMDESystemStatus };
+/**
+ * Simulate API call to NETA-21 module
+ */
+export const fetchDriveDataFromAPI = async (moduleId: string): Promise<RMDEApiResponse> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log(`Fetching data from API for module ${moduleId}`);
+      
+      // Generate mock API response
+      const response: RMDEApiResponse = {
+        success: Math.random() > 0.1,
+        timestamp: new Date().toISOString(),
+        drives: Array(Math.floor(Math.random() * 3) + 1).fill(0).map((_, index) => ({
+          id: index + 1,
+          speed: Math.floor(Math.random() * 1000) + 1000,
+          temperature: Math.floor(Math.random() * 20) + 40,
+          torque: Math.floor(Math.random() * 150) + 50,
+          faults: Math.random() > 0.7 ? generateRandomFaults(Math.floor(Math.random() * 2) + 1) : []
+        }))
+      };
+      
+      resolve(response);
+    }, 500 + Math.random() * 1000);
+  });
+};
+
+/**
+ * Send email notification (simulation)
+ */
+export const sendEmailNotification = (drive: RMDEDrive, errorMessage: string): void => {
+  console.info(`Email notification would be sent for ${drive.name} in ${drive.status} condition`);
+};
+
+export type { 
+  RMDEDrive, 
+  RMDEError, 
+  RMDEModule, 
+  RMDESystemStatus, 
+  RMDEFault, 
+  RMDEApiResponse 
+};
