@@ -49,7 +49,7 @@ const Neta21Guide = () => {
               <li>View data sent to cloud:
                 <ul className="list-disc ml-6 mt-1">
                   <li>Go to Navigation window</li>
-                  <li>Click Reports > Report events</li>
+                  <li>Click Reports &gt; Report events</li>
                 </ul>
               </li>
               <li>Export detailed data as attachment to view raw data being sent</li>
