@@ -4,6 +4,7 @@ import ModemSettingsForm from "@/components/ModemSettingsForm";
 import ModemSetupGuide from "@/components/ModemSetupGuide";
 import NetworkConfigGuide from "@/components/NetworkConfigGuide";
 import ModemPasswordConfig from "@/components/ModemPasswordConfig";
+import Neta21Guide from "@/components/Neta21Guide";
 
 const SimConfiguration = () => {
   return (
@@ -13,6 +14,7 @@ const SimConfiguration = () => {
       <div className="grid gap-8">
         <NetworkConfigGuide />
         <ModemPasswordConfig />
+        <Neta21Guide />
         <ModemSetupGuide />
         
         <div className="grid gap-8 md:grid-cols-2">
