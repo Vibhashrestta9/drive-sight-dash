@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Download, Power, Clock, SdCard as SdCardIcon, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { Download, Power, Clock, Memory, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface SetupStep {
@@ -38,7 +38,7 @@ const ModemSetupGuide = () => {
     {
       title: "Insert SD Card",
       description: "Place the SD card with comcfg.txt file in the modem SD card slot",
-      icon: <SdCardIcon className="h-5 w-5" />,
+      icon: <Memory className="h-5 w-5" />,
       status: currentStep > 3 ? 'completed' : currentStep === 3 ? 'in-progress' : 'waiting',
       notes: [
         "Within five seconds, the modem will display a slow blinking pattern of the USR LED",
