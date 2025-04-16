@@ -2,6 +2,7 @@
 import SimCardMonitor from "@/components/SimCardMonitor";
 import ModemSettingsForm from "@/components/ModemSettingsForm";
 import ModemSetupGuide from "@/components/ModemSetupGuide";
+import NetworkConfigGuide from "@/components/NetworkConfigGuide";
 
 const SimConfiguration = () => {
   return (
@@ -9,6 +10,7 @@ const SimConfiguration = () => {
       <h1 className="text-3xl font-bold mb-8">SIM Configuration</h1>
       
       <div className="grid gap-8">
+        <NetworkConfigGuide />
         <ModemSetupGuide />
         
         <div className="grid gap-8 md:grid-cols-2">
