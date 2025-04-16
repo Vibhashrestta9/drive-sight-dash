@@ -3,6 +3,7 @@ import SimCardMonitor from "@/components/SimCardMonitor";
 import ModemSettingsForm from "@/components/ModemSettingsForm";
 import ModemSetupGuide from "@/components/ModemSetupGuide";
 import NetworkConfigGuide from "@/components/NetworkConfigGuide";
+import ModemPasswordConfig from "@/components/ModemPasswordConfig";
 
 const SimConfiguration = () => {
   return (
@@ -11,6 +12,7 @@ const SimConfiguration = () => {
       
       <div className="grid gap-8">
         <NetworkConfigGuide />
+        <ModemPasswordConfig />
         <ModemSetupGuide />
         
         <div className="grid gap-8 md:grid-cols-2">
