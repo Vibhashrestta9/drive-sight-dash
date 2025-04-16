@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Network, LogIn, CloudCheck, Download, Globe } from 'lucide-react';
+import { Network, LogIn, Cloud, Download, Globe } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 
@@ -41,7 +41,7 @@ const Neta21Guide = () => {
           {/* Cloud Connection Status */}
           <div className="rounded-lg border p-4">
             <h3 className="font-medium flex items-center gap-2 mb-3">
-              <CloudCheck className="h-5 w-5" />
+              <Cloud className="h-5 w-5" />
               Cloud Connection Status
             </h3>
             <ol className="list-decimal ml-5 space-y-2">
