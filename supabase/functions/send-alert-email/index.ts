@@ -2,15 +2,14 @@
 import { serve } from "https://deno.fresh.dev/server";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const SENDGRID_API_KEY = Deno.env.get('SENDGRID_API_KEY');
-const SENDER_EMAIL = Deno.env.get('SENDER_EMAIL');
-
 interface EmailAlert {
   driverName: string;
   location: string;
   timestamp: string;
   status: string;
   recipientEmail: string;
+  sendgridApiKey: string;
+  senderEmail: string;
 }
 
 serve(async (req) => {
@@ -19,7 +18,11 @@ serve(async (req) => {
   }
 
   try {
-    const { driverName, location, timestamp, status, recipientEmail } = await req.json() as EmailAlert;
+    const { driverName, location, timestamp, status, recipientEmail, sendgridApiKey, senderEmail } = await req.json() as EmailAlert;
+    
+    if (!sendgridApiKey || !senderEmail) {
+      throw new Error('SendGrid API key and sender email are required');
+    }
 
     const emailBody = `
       Driver ${driverName} is in CRITICAL condition!
@@ -33,14 +36,14 @@ serve(async (req) => {
     const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${SENDGRID_API_KEY}`,
+        'Authorization': `Bearer ${sendgridApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         personalizations: [{
           to: [{ email: recipientEmail }],
         }],
-        from: { email: SENDER_EMAIL },
+        from: { email: senderEmail },
         subject: `🚨 CRITICAL DRIVER ALERT: ${driverName}`,
         content: [{
           type: 'text/plain',

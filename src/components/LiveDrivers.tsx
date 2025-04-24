@@ -29,6 +29,8 @@ const LiveDrivers = () => {
     emailAddress: '',
     sendSMS: false,
     phoneNumber: '',
+    sendgridApiKey: '',
+    senderEmail: '',
   });
   
   const [sendingAlert, setSendingAlert] = useState(false);
@@ -138,22 +140,37 @@ const LiveDrivers = () => {
           description: `Sending notification to ${alertSettings.emailAddress}`,
         });
         
-        const success = await sendEmailAlert({
-          driverName: driver.name,
-          location: driver.location,
-          timestamp: new Date().toLocaleString(),
-          status: driver.status
-        }, alertSettings.emailAddress);
-        
-        if (success) {
-          toast({
-            title: "Alert Email Sent",
-            description: `Notification sent to ${alertSettings.emailAddress}`,
-          });
+        if (alertSettings.sendgridApiKey && alertSettings.senderEmail) {
+          const success = await sendEmailAlert(
+            {
+              driverName: driver.name,
+              location: driver.location,
+              timestamp: new Date().toLocaleString(),
+              status: driver.status
+            }, 
+            alertSettings.emailAddress,
+            {
+              sendgridApiKey: alertSettings.sendgridApiKey,
+              senderEmail: alertSettings.senderEmail
+            }
+          );
+          
+          if (success) {
+            toast({
+              title: "Alert Email Sent",
+              description: `Notification sent to ${alertSettings.emailAddress}`,
+            });
+          } else {
+            toast({
+              title: "Failed to Send Alert",
+              description: "Could not send email notification. Please check your SendGrid settings.",
+              variant: "destructive",
+            });
+          }
         } else {
           toast({
-            title: "Failed to Send Alert",
-            description: "Could not send email notification. Please check your email address.",
+            title: "SendGrid Configuration Missing",
+            description: "Please configure SendGrid API key and sender email in Alert Settings",
             variant: "destructive",
           });
         }

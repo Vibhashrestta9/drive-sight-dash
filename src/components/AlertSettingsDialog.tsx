@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { AlertTriangle, MailCheck } from 'lucide-react';
+import { AlertTriangle, MailCheck, Lock } from 'lucide-react';
 
 interface AlertSettingsDialogProps {
   onSave: (settings: AlertSettings) => void;
@@ -26,11 +26,14 @@ export interface AlertSettings {
   emailAddress: string;
   sendSMS: boolean;
   phoneNumber: string;
+  sendgridApiKey?: string;
+  senderEmail?: string;
 }
 
 const AlertSettingsDialog = ({ onSave, currentSettings }: AlertSettingsDialogProps) => {
   const [settings, setSettings] = useState<AlertSettings>(currentSettings);
   const [open, setOpen] = useState(false);
+  const [showApiConfig, setShowApiConfig] = useState(false);
   const { toast } = useToast();
 
   const handleSave = () => {
@@ -39,6 +42,16 @@ const AlertSettingsDialog = ({ onSave, currentSettings }: AlertSettingsDialogPro
       toast({
         title: "Email Required",
         description: "Please enter an email address for alerts",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate SendGrid credentials if providing them
+    if (settings.enabled && showApiConfig && (!settings.sendgridApiKey || !settings.senderEmail)) {
+      toast({
+        title: "SendGrid Configuration Required",
+        description: "Please enter both SendGrid API key and sender email",
         variant: "destructive",
       });
       return;
@@ -108,6 +121,49 @@ const AlertSettingsDialog = ({ onSave, currentSettings }: AlertSettingsDialogPro
                   Critical alerts will be sent to this email address.
                 </p>
               </div>
+              
+              <div className="flex items-center justify-between">
+                <Label htmlFor="api-config" className="flex items-center gap-2">
+                  <Lock className="h-4 w-4" /> Configure SendGrid API
+                </Label>
+                <Switch
+                  id="api-config"
+                  checked={showApiConfig}
+                  onCheckedChange={(checked) => setShowApiConfig(checked)}
+                />
+              </div>
+              
+              {showApiConfig && (
+                <>
+                  <div className="grid gap-2">
+                    <Label htmlFor="sendgrid-key">SendGrid API Key</Label>
+                    <Input
+                      id="sendgrid-key"
+                      type="password"
+                      placeholder="SG.xxxxxxxxxxxxxxxxxxxxxxxx"
+                      value={settings.sendgridApiKey || ''}
+                      onChange={(e) => setSettings({ ...settings, sendgridApiKey: e.target.value })}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Your SendGrid API key to send emails. Will be stored locally.
+                    </p>
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="sender-email">Sender Email</Label>
+                    <Input
+                      id="sender-email"
+                      type="email" 
+                      placeholder="alerts@yourcompany.com"
+                      value={settings.senderEmail || ''}
+                      onChange={(e) => setSettings({ ...settings, senderEmail: e.target.value })}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Email address that will appear as the sender. Must be verified in SendGrid.
+                    </p>
+                  </div>
+                </>
+              )}
               
               <div className="flex items-center justify-between">
                 <Label htmlFor="sms-enabled">SMS Notifications</Label>

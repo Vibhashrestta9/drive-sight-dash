@@ -6,7 +6,16 @@ interface AlertData {
   status: string;
 }
 
-export const sendEmailAlert = async (data: AlertData, emailAddress: string): Promise<boolean> => {
+interface AlertSettings {
+  sendgridApiKey?: string;
+  senderEmail?: string;
+}
+
+export const sendEmailAlert = async (
+  data: AlertData, 
+  emailAddress: string,
+  settings?: AlertSettings
+): Promise<boolean> => {
   if (!emailAddress) {
     console.error('No email address provided for alerts');
     return false;
@@ -15,6 +24,12 @@ export const sendEmailAlert = async (data: AlertData, emailAddress: string): Pro
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(emailAddress)) {
     console.error('Invalid email format:', emailAddress);
+    return false;
+  }
+  
+  // Check if SendGrid credentials are available
+  if (!settings?.sendgridApiKey || !settings?.senderEmail) {
+    console.error('SendGrid API key and sender email are required');
     return false;
   }
 
@@ -27,6 +42,8 @@ export const sendEmailAlert = async (data: AlertData, emailAddress: string): Pro
       body: JSON.stringify({
         ...data,
         recipientEmail: emailAddress,
+        sendgridApiKey: settings.sendgridApiKey,
+        senderEmail: settings.senderEmail
       }),
     });
 
