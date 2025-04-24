@@ -133,6 +133,11 @@ const LiveDrivers = () => {
       setSendingAlert(true);
       
       try {
+        toast({
+          title: "Sending Alert Email",
+          description: `Sending notification to ${alertSettings.emailAddress}`,
+        });
+        
         const success = await sendEmailAlert({
           driverName: driver.name,
           location: driver.location,
@@ -148,18 +153,29 @@ const LiveDrivers = () => {
         } else {
           toast({
             title: "Failed to Send Alert",
-            description: "Could not send email notification",
+            description: "Could not send email notification. Please check your email address.",
             variant: "destructive",
           });
         }
       } catch (error) {
         console.error("Error sending alert:", error);
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred while sending the alert.",
+          variant: "destructive",
+        });
       } finally {
         setSendingAlert(false);
       }
+    } else if (alertSettings.enabled && !alertSettings.emailAddress) {
+      toast({
+        title: "Missing Email Address",
+        description: "Please set an email address in Alert Settings",
+        variant: "destructive",
+      });
     }
     
-    console.log(`Email notification would be sent for ${driver.name} in critical condition`);
+    console.log(`Alert notification for ${driver.name} in critical condition`);
   };
 
   const simulateCriticalCondition = () => {
@@ -233,8 +249,13 @@ const LiveDrivers = () => {
             )}
             <Badge className="bg-green-500">{drivers.filter(d => d.status === 'active').length} Active</Badge>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={simulateCriticalCondition}>
-                Test Alert
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={simulateCriticalCondition}
+                disabled={sendingAlert}
+              >
+                {sendingAlert ? "Sending..." : "Test Alert"}
               </Button>
               <AlertSettingsDialog 
                 onSave={handleSaveAlertSettings} 

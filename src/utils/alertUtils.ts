@@ -22,39 +22,59 @@ export const sendEmailAlert = async (data: AlertData, emailAddress: string): Pro
     return false;
   }
 
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(emailAddress)) {
+    console.error('Invalid email format:', emailAddress);
+    return false;
+  }
+
   try {
-    // In a production environment, this would call your backend API
-    // which would handle the actual email sending through services like SendGrid, AWS SES, etc.
-    
-    // For demo purposes, we'll simulate the API call
+    // For demonstration purposes, log the email that would be sent
     console.log(`📧 ALERT EMAIL would be sent to ${emailAddress} with data:`, data);
     
-    // Simulated API call - in real app, replace with actual API endpoint
-    const response = await fetch('https://mock-email-service.example/send', {
+    // In a production environment, you would use a real email service API
+    // Examples include SendGrid, Mailgun, AWS SES, or your own backend email service
+    
+    // This is a simulation for the demo - in a real app, replace with actual API endpoint
+    const emailBody = `
+      Driver ${data.driverName} is in CRITICAL condition!
+      Location: ${data.location}
+      Time: ${data.timestamp}
+      Status: ${data.status}
+      
+      Please check on the driver immediately.
+    `;
+    
+    // For demo purposes only - simulating email send success
+    console.log('Email Content:', {
+      to: emailAddress,
+      subject: `🚨 CRITICAL DRIVER ALERT: ${data.driverName}`,
+      message: emailBody
+    });
+    
+    // This is where you would connect to a real email service API
+    // For demonstration purposes, we'll simulate a successful API call
+    console.log('Email would be sent in production environment');
+    
+    // To use a real email service, you would uncomment and modify code like this:
+    /*
+    const response = await fetch('https://your-real-email-service.com/api/send', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer YOUR_API_KEY_HERE'
       },
-      // This is just a simulation - it won't actually send an email
       body: JSON.stringify({
         to: emailAddress,
         subject: `🚨 CRITICAL DRIVER ALERT: ${data.driverName}`,
-        message: `
-          Driver ${data.driverName} is in CRITICAL condition!
-          Location: ${data.location}
-          Time: ${data.timestamp}
-          Status: ${data.status}
-          
-          Please check on the driver immediately.
-        `,
+        message: emailBody,
       }),
-    }).catch(() => {
-      // Catch network errors for the demo
-      console.log('Email would be sent in production environment');
-      return { ok: true }; // Simulate success for demo
     });
-
     return response.ok;
+    */
+    
+    return true; // Simulate success for demo
   } catch (error) {
     console.error('Error sending email alert:', error);
     return false;
