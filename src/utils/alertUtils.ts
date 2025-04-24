@@ -33,6 +33,9 @@ export const sendEmailAlert = async (
     return false;
   }
 
+  console.log('Attempting to send email alert to:', emailAddress);
+  console.log('Alert data:', JSON.stringify(data));
+
   try {
     const response = await fetch('https://87e62aba-bf20-4563-aed5-3388a32d7039.supabase.co/functions/v1/send-alert-email', {
       method: 'POST',
@@ -50,10 +53,12 @@ export const sendEmailAlert = async (
     const result = await response.json();
     
     if (!response.ok) {
+      console.error('Email sending failed with status:', response.status);
+      console.error('Error details:', result.error || 'Unknown error');
       throw new Error(result.error || 'Failed to send email');
     }
 
-    console.log('Email alert sent successfully');
+    console.log('Email alert sent successfully to:', emailAddress);
     return true;
   } catch (error) {
     console.error('Error sending email alert:', error);

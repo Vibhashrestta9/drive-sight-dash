@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MapPin, Activity, AlertTriangle, Bell } from 'lucide-react';
+import { MapPin, Activity, AlertTriangle, Bell, Check, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import AlertSettingsDialog, { AlertSettings } from './AlertSettingsDialog';
@@ -141,6 +141,8 @@ const LiveDrivers = () => {
         });
         
         if (alertSettings.sendgridApiKey && alertSettings.senderEmail) {
+          console.log('Preparing to send email alert with configured SendGrid settings');
+          
           const success = await sendEmailAlert(
             {
               driverName: driver.name,
@@ -159,12 +161,14 @@ const LiveDrivers = () => {
             toast({
               title: "Alert Email Sent",
               description: `Notification sent to ${alertSettings.emailAddress}`,
+              icon: <Check className="h-4 w-4 text-green-500" />,
             });
           } else {
             toast({
               title: "Failed to Send Alert",
-              description: "Could not send email notification. Please check your SendGrid settings.",
+              description: "Could not send email notification. Check your console logs for details.",
               variant: "destructive",
+              icon: <XCircle className="h-4 w-4 text-red-500" />,
             });
           }
         } else {
@@ -178,7 +182,7 @@ const LiveDrivers = () => {
         console.error("Error sending alert:", error);
         toast({
           title: "Error",
-          description: "An unexpected error occurred while sending the alert.",
+          description: "An unexpected error occurred while sending the alert. Check console for details.",
           variant: "destructive",
         });
       } finally {
@@ -238,6 +242,72 @@ const LiveDrivers = () => {
     }
   }, []);
 
+  const testSendEmail = async () => {
+    setSendingAlert(true);
+    try {
+      if (!alertSettings.enabled || !alertSettings.emailAddress) {
+        toast({
+          title: "Email Alerts Not Enabled",
+          description: "Please enable alerts and set an email address in Alert Settings",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (!alertSettings.sendgridApiKey || !alertSettings.senderEmail) {
+        toast({
+          title: "SendGrid Configuration Missing",
+          description: "Please configure SendGrid API key and sender email in Alert Settings",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Testing Email Alert",
+        description: "Sending a test email...",
+      });
+
+      const testSuccess = await sendEmailAlert(
+        {
+          driverName: "TEST DRIVER",
+          location: "Test Location",
+          timestamp: new Date().toLocaleString(),
+          status: "critical"
+        },
+        alertSettings.emailAddress,
+        {
+          sendgridApiKey: alertSettings.sendgridApiKey,
+          senderEmail: alertSettings.senderEmail
+        }
+      );
+
+      if (testSuccess) {
+        toast({
+          title: "Test Email Sent",
+          description: `A test notification was sent to ${alertSettings.emailAddress}`,
+          icon: <Check className="h-4 w-4 text-green-500" />,
+        });
+      } else {
+        toast({
+          title: "Test Email Failed",
+          description: "Failed to send test email. Please check console for details.",
+          variant: "destructive",
+          icon: <XCircle className="h-4 w-4 text-red-500" />,
+        });
+      }
+    } catch (error) {
+      console.error("Error sending test email:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send test email. See console for details.",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingAlert(false);
+    }
+  };
+
   if (loading) {
     return (
       <Card>
@@ -273,6 +343,16 @@ const LiveDrivers = () => {
                 disabled={sendingAlert}
               >
                 {sendingAlert ? "Sending..." : "Test Alert"}
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="gap-1"
+                onClick={testSendEmail}
+                disabled={sendingAlert}
+              >
+                <Bell className="h-4 w-4" />
+                Test Email
               </Button>
               <AlertSettingsDialog 
                 onSave={handleSaveAlertSettings} 
