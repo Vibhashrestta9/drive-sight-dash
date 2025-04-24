@@ -1,22 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar } from '@/components/ui/avatar';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { MapPin, Activity, AlertTriangle, Bell, Check, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import AlertSettingsDialog, { AlertSettings } from './AlertSettingsDialog';
+import { Check, XCircle } from 'lucide-react';
 import { sendEmailAlert } from '@/utils/alertUtils';
-
-interface Driver {
-  id: number;
-  name: string;
-  status: 'active' | 'idle' | 'offline' | 'critical';
-  location: string;
-  lastUpdate: string;
-  avatar: string;
-}
+import { AlertSettings } from './AlertSettingsDialog';
+import { Driver } from '@/types/driverTypes';
+import DriverList from './drivers/DriverList';
+import AlertControls from './drivers/AlertControls';
 
 const LiveDrivers = () => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
@@ -137,12 +127,10 @@ const LiveDrivers = () => {
       try {
         toast({
           title: "Sending Alert Email",
-          description: `Sending notification to ${alertSettings.emailAddress}`,
+          description: `Sending notification to ${alertSettings.emailAddress}`
         });
         
         if (alertSettings.sendgridApiKey && alertSettings.senderEmail) {
-          console.log('Preparing to send email alert with configured SendGrid settings');
-          
           const success = await sendEmailAlert(
             {
               driverName: driver.name,
@@ -160,15 +148,13 @@ const LiveDrivers = () => {
           if (success) {
             toast({
               title: "Alert Email Sent",
-              description: `Notification sent to ${alertSettings.emailAddress}`,
-              icon: <Check className="h-4 w-4 text-green-500" />,
+              description: `Notification sent to ${alertSettings.emailAddress}`
             });
           } else {
             toast({
               title: "Failed to Send Alert",
               description: "Could not send email notification. Check your console logs for details.",
-              variant: "destructive",
-              icon: <XCircle className="h-4 w-4 text-red-500" />,
+              variant: "destructive"
             });
           }
         } else {
@@ -183,7 +169,7 @@ const LiveDrivers = () => {
         toast({
           title: "Error",
           description: "An unexpected error occurred while sending the alert. Check console for details.",
-          variant: "destructive",
+          variant: "destructive"
         });
       } finally {
         setSendingAlert(false);
@@ -192,7 +178,7 @@ const LiveDrivers = () => {
       toast({
         title: "Missing Email Address",
         description: "Please set an email address in Alert Settings",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
     
@@ -209,21 +195,6 @@ const LiveDrivers = () => {
       handleCriticalAlert(driver);
       return updatedDrivers;
     });
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-500';
-      case 'idle':
-        return 'bg-yellow-500';
-      case 'offline':
-        return 'bg-gray-500';
-      case 'critical':
-        return 'bg-red-500';
-      default:
-        return 'bg-gray-500';
-    }
   };
 
   const handleSaveAlertSettings = (newSettings: AlertSettings) => {
@@ -249,7 +220,7 @@ const LiveDrivers = () => {
         toast({
           title: "Email Alerts Not Enabled",
           description: "Please enable alerts and set an email address in Alert Settings",
-          variant: "destructive",
+          variant: "destructive"
         });
         return;
       }
@@ -258,14 +229,14 @@ const LiveDrivers = () => {
         toast({
           title: "SendGrid Configuration Missing",
           description: "Please configure SendGrid API key and sender email in Alert Settings",
-          variant: "destructive",
+          variant: "destructive"
         });
         return;
       }
 
       toast({
         title: "Testing Email Alert",
-        description: "Sending a test email...",
+        description: "Sending a test email..."
       });
 
       const testSuccess = await sendEmailAlert(
@@ -285,15 +256,13 @@ const LiveDrivers = () => {
       if (testSuccess) {
         toast({
           title: "Test Email Sent",
-          description: `A test notification was sent to ${alertSettings.emailAddress}`,
-          icon: <Check className="h-4 w-4 text-green-500" />,
+          description: `A test notification was sent to ${alertSettings.emailAddress}`
         });
       } else {
         toast({
           title: "Test Email Failed",
           description: "Failed to send test email. Please check console for details.",
-          variant: "destructive",
-          icon: <XCircle className="h-4 w-4 text-red-500" />,
+          variant: "destructive"
         });
       }
     } catch (error) {
@@ -301,7 +270,7 @@ const LiveDrivers = () => {
       toast({
         title: "Error",
         description: "Failed to send test email. See console for details.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setSendingAlert(false);
@@ -327,81 +296,19 @@ const LiveDrivers = () => {
             <CardTitle>Live Drivers</CardTitle>
             <CardDescription>Real-time driver status and locations</CardDescription>
           </div>
-          <div className="flex items-center gap-2">
-            {criticalAlerts.length > 0 && (
-              <Badge className="bg-red-500 animate-pulse flex items-center gap-1">
-                <AlertTriangle size={14} />
-                {criticalAlerts.length} Critical
-              </Badge>
-            )}
-            <Badge className="bg-green-500">{drivers.filter(d => d.status === 'active').length} Active</Badge>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={simulateCriticalCondition}
-                disabled={sendingAlert}
-              >
-                {sendingAlert ? "Sending..." : "Test Alert"}
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="gap-1"
-                onClick={testSendEmail}
-                disabled={sendingAlert}
-              >
-                <Bell className="h-4 w-4" />
-                Test Email
-              </Button>
-              <AlertSettingsDialog 
-                onSave={handleSaveAlertSettings} 
-                currentSettings={alertSettings} 
-              />
-            </div>
-          </div>
+          <AlertControls 
+            criticalAlerts={criticalAlerts}
+            activeDrivers={drivers.filter(d => d.status === 'active').length}
+            onSimulateCritical={simulateCriticalCondition}
+            onTestEmail={testSendEmail}
+            onSaveSettings={handleSaveAlertSettings}
+            currentSettings={alertSettings}
+            sendingAlert={sendingAlert}
+          />
         </div>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[300px] pr-4">
-          <div className="space-y-4">
-            {drivers.map((driver) => (
-              <div key={driver.id} 
-                className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-                  driver.status === 'critical' 
-                    ? 'bg-red-50 border-red-200 animate-pulse dark:bg-red-950/20 dark:border-red-800' 
-                    : 'bg-card hover:bg-accent/20'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Avatar className={`h-10 w-10 ${driver.status === 'critical' ? 'ring-2 ring-red-500' : ''}`}>
-                    <div className="flex h-full w-full items-center justify-center bg-primary text-primary-foreground">
-                      {driver.avatar}
-                    </div>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-medium">{driver.name}</h3>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <MapPin size={14} />
-                      <span>{driver.location}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-1">
-                  <div className="flex items-center">
-                    <div className={`h-2 w-2 rounded-full ${getStatusColor(driver.status)} mr-2 ${
-                      driver.status === 'critical' ? 'animate-ping' : ''
-                    }`}></div>
-                    <span className={`text-sm font-medium capitalize ${
-                      driver.status === 'critical' ? 'text-red-600 dark:text-red-400' : ''
-                    }`}>{driver.status}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{driver.lastUpdate}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
+        <DriverList drivers={drivers} />
       </CardContent>
     </Card>
   );
