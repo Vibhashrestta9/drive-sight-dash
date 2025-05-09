@@ -9,6 +9,7 @@ import DriverPerformance from '@/components/DriverPerformance';
 import RMDEDashboard from '@/components/RMDEDashboard';
 import DriveHealthIndex from '@/components/DriveHealthIndex';
 import BehavioralFingerprint from '@/components/BehavioralFingerprint';
+import DigitalTwinStatus from '@/components/DigitalTwinStatus';
 import { generateInitialRMDEData } from '@/utils/rmdeUtils';
 import { useState, useEffect } from 'react';
 
@@ -50,6 +51,11 @@ const Index = () => {
           <div className="grid grid-cols-1 gap-6">
             <LiveDrivers />
           </div>
+        </div>
+        
+        {/* Digital Twin Status Section */}
+        <div className="mb-6">
+          <DigitalTwinStatus />
         </div>
         
         {/* Drive Health Index Section */}
