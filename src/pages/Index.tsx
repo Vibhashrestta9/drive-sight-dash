@@ -7,8 +7,19 @@ import PerformanceGraph from '@/components/PerformanceGraph';
 import LiveDrivers from '@/components/LiveDrivers';
 import DriverPerformance from '@/components/DriverPerformance';
 import RMDEDashboard from '@/components/RMDEDashboard';
+import DriveHealthIndex from '@/components/DriveHealthIndex';
+import { generateInitialRMDEData } from '@/utils/rmdeUtils';
+import { useState, useEffect } from 'react';
 
 const Index = () => {
+  const [rmdeData, setRmdeData] = useState(generateInitialRMDEData());
+  
+  useEffect(() => {
+    // This ensures we have consistent data across components
+    const initialData = generateInitialRMDEData();
+    setRmdeData(initialData);
+  }, []);
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
@@ -30,7 +41,7 @@ const Index = () => {
         <DriveMetricsCards />
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Performance Graph (Takes 2/3 width on large screens) */}
           <PerformanceGraph />
 
@@ -39,9 +50,14 @@ const Index = () => {
             <LiveDrivers />
           </div>
         </div>
+        
+        {/* Drive Health Index Section */}
+        <div className="mb-6">
+          <DriveHealthIndex drives={rmdeData} />
+        </div>
 
         {/* RMDE Dashboard Section */}
-        <div className="mt-6">
+        <div className="mb-6">
           <RMDEDashboard />
         </div>
 

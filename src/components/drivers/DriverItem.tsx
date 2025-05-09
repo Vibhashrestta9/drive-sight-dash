@@ -1,9 +1,11 @@
 
 import React from 'react';
 import { Avatar } from '@/components/ui/avatar';
-import { MapPin } from 'lucide-react';
+import { MapPin, ThermometerIcon } from 'lucide-react';
 import { Driver } from '@/types/driverTypes';
-import { getStatusColor } from '@/types/driverTypes';
+import { getStatusColor, getDHIStatusColor } from '@/types/driverTypes';
+import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface DriverItemProps {
   driver: Driver;
@@ -33,7 +35,7 @@ const DriverItem = ({ driver }: DriverItemProps) => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col items-end gap-1">
+      <div className="flex flex-col items-end gap-2">
         <div className="flex items-center">
           <div className={`h-2 w-2 rounded-full ${getStatusColor(driver.status)} mr-2 ${
             driver.status === 'critical' ? 'animate-ping' : ''
@@ -43,6 +45,28 @@ const DriverItem = ({ driver }: DriverItemProps) => {
           }`}>{driver.status}</span>
         </div>
         <span className="text-xs text-muted-foreground">{driver.lastUpdate}</span>
+        
+        {driver.dhi !== undefined && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-1 mt-1">
+                  <ThermometerIcon size={14} className="text-muted-foreground" />
+                  <Progress 
+                    value={driver.dhi} 
+                    className={`w-16 h-1.5 ${getDHIStatusColor(driver.dhi)}`} 
+                  />
+                  <span className="text-xs font-medium">{driver.dhi}</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">
+                  {driver.dhiExplanation || `Drive Health Index: ${driver.dhi}`}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </div>
     </div>
   );
