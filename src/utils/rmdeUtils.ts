@@ -14,6 +14,7 @@ interface RMDEDrive {
   vibrationLevel?: number;
   loadCapacity?: number;
   previousDHI?: number;
+  behavioralFingerprint?: boolean; // Flag if fingerprint data exists
 }
 
 interface RMDEError {
@@ -76,7 +77,8 @@ export const generateInitialRMDEData = (): RMDEDrive[] => {
       responseTime,
       vibrationLevel,
       loadCapacity,
-      previousDHI: Math.floor(Math.random() * 15) + healthScore - 10 // Previous DHI score (varies slightly from current healthScore)
+      previousDHI: Math.floor(Math.random() * 15) + healthScore - 10, // Previous DHI score (varies slightly from current healthScore)
+      behavioralFingerprint: true // All drives have fingerprint data in this demo
     };
   });
 };
@@ -173,7 +175,8 @@ export const updateRMDEData = (drives: RMDEDrive[]): RMDEDrive[] => {
         vibrationLevel: drive.vibrationLevel ? 
           Number(Math.max(0.1, Math.min(7, drive.vibrationLevel + vibrationChange)).toFixed(2)) : undefined,
         loadCapacity: drive.loadCapacity ? 
-          Math.max(40, Math.min(100, drive.loadCapacity + loadCapacityChange)) : undefined
+          Math.max(40, Math.min(100, drive.loadCapacity + loadCapacityChange)) : undefined,
+        behavioralFingerprint: true
       };
     }
     return drive;

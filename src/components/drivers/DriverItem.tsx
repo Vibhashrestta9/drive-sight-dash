@@ -1,9 +1,15 @@
 
 import React from 'react';
 import { Avatar } from '@/components/ui/avatar';
-import { MapPin, ThermometerIcon } from 'lucide-react';
+import { MapPin, ThermometerIcon, Fingerprint } from 'lucide-react';
 import { Driver } from '@/types/driverTypes';
-import { getStatusColor, getDHIStatusColor, getDHITrendInfo } from '@/types/driverTypes';
+import { 
+  getStatusColor, 
+  getDHIStatusColor, 
+  getDHITrendInfo,
+  getBehaviorMatchColor,
+  getBehaviorStatusText
+} from '@/types/driverTypes';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -48,6 +54,7 @@ const DriverItem = ({ driver }: DriverItemProps) => {
         </div>
         <span className="text-xs text-muted-foreground">{driver.lastUpdate}</span>
         
+        {/* DHI Score */}
         {driver.dhi !== undefined && (
           <TooltipProvider>
             <Tooltip>
@@ -79,6 +86,36 @@ const DriverItem = ({ driver }: DriverItemProps) => {
                     {driver.dhiTrend.direction === 'up' ? '+' : 
                      driver.dhiTrend.direction === 'down' ? '-' : ''}
                     {Math.abs(driver.dhiTrend.change)}%
+                  </p>
+                )}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+        
+        {/* Behavioral Fingerprint Match Score */}
+        {driver.behaviorMatch !== undefined && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-1 mt-1">
+                  <Fingerprint size={14} className="text-muted-foreground" />
+                  <Progress 
+                    value={driver.behaviorMatch} 
+                    className={`w-16 h-1.5 ${getBehaviorMatchColor(driver.behaviorMatch)}`} 
+                  />
+                  <div className="flex items-center">
+                    <span className="text-xs font-medium">{driver.behaviorMatch}</span>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">
+                  Behavioral Fingerprint Match: {driver.behaviorMatch}%
+                </p>
+                {driver.behaviorStatus && (
+                  <p className="text-xs mt-1">
+                    Status: {getBehaviorStatusText(driver.behaviorStatus)}
                   </p>
                 )}
               </TooltipContent>

@@ -1,4 +1,3 @@
-
 export interface Driver {
   id: number;
   name: string;
@@ -9,6 +8,8 @@ export interface Driver {
   dhi?: number; // Drive Health Index
   dhiExplanation?: string; // Explanation of DHI score
   dhiTrend?: { change: number; direction: 'up' | 'down' | 'stable' }; // DHI trend information
+  behaviorMatch?: number; // Behavioral match score (0-100)
+  behaviorStatus?: 'normal' | 'notable' | 'significant' | 'critical'; // Behavior deviation status
 }
 
 export const getStatusColor = (status: string) => {
@@ -64,4 +65,37 @@ export const getDHITrendInfo = (trend?: { change: number; direction: 'up' | 'dow
   }
   
   return { icon, colorClass };
+};
+
+/**
+ * Get behavior match status color class
+ */
+export const getBehaviorMatchColor = (matchScore: number | undefined): string => {
+  if (matchScore === undefined) return 'bg-gray-500';
+  
+  if (matchScore >= 90) return 'bg-green-500';
+  if (matchScore >= 80) return 'bg-emerald-500';
+  if (matchScore >= 70) return 'bg-yellow-500';
+  if (matchScore >= 60) return 'bg-orange-500';
+  return 'bg-red-500';
+};
+
+/**
+ * Get behavior status text
+ */
+export const getBehaviorStatusText = (status: string | undefined): string => {
+  if (!status) return '';
+  
+  switch (status) {
+    case 'normal':
+      return 'Normal';
+    case 'notable':
+      return 'Notable Change';
+    case 'significant':
+      return 'Significant Deviation';
+    case 'critical':
+      return 'Critical Deviation';
+    default:
+      return '';
+  }
 };

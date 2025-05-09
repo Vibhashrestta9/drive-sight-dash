@@ -8,6 +8,7 @@ import LiveDrivers from '@/components/LiveDrivers';
 import DriverPerformance from '@/components/DriverPerformance';
 import RMDEDashboard from '@/components/RMDEDashboard';
 import DriveHealthIndex from '@/components/DriveHealthIndex';
+import BehavioralFingerprint from '@/components/BehavioralFingerprint';
 import { generateInitialRMDEData } from '@/utils/rmdeUtils';
 import { useState, useEffect } from 'react';
 
@@ -56,6 +57,11 @@ const Index = () => {
           <DriveHealthIndex drives={rmdeData} />
         </div>
 
+        {/* Behavioral Fingerprint Section */}
+        <div className="mb-6">
+          <BehavioralFingerprint drives={rmdeData} />
+        </div>
+        
         {/* RMDE Dashboard Section */}
         <div className="mb-6">
           <RMDEDashboard />
