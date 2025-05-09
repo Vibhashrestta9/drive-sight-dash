@@ -3,7 +3,7 @@ import React from 'react';
 import { Avatar } from '@/components/ui/avatar';
 import { MapPin, ThermometerIcon } from 'lucide-react';
 import { Driver } from '@/types/driverTypes';
-import { getStatusColor, getDHIStatusColor } from '@/types/driverTypes';
+import { getStatusColor, getDHIStatusColor, getDHITrendInfo } from '@/types/driverTypes';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -12,6 +12,8 @@ interface DriverItemProps {
 }
 
 const DriverItem = ({ driver }: DriverItemProps) => {
+  const { icon, colorClass } = getDHITrendInfo(driver.dhiTrend);
+  
   return (
     <div
       key={driver.id} 
@@ -56,13 +58,29 @@ const DriverItem = ({ driver }: DriverItemProps) => {
                     value={driver.dhi} 
                     className={`w-16 h-1.5 ${getDHIStatusColor(driver.dhi)}`} 
                   />
-                  <span className="text-xs font-medium">{driver.dhi}</span>
+                  <div className="flex items-center">
+                    <span className="text-xs font-medium">{driver.dhi}</span>
+                    {driver.dhiTrend && Math.abs(driver.dhiTrend.change) >= 1 && (
+                      <span className={`text-xs ml-0.5 ${colorClass}`}>
+                        {icon}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-xs">
                   {driver.dhiExplanation || `Drive Health Index: ${driver.dhi}`}
                 </p>
+                {driver.dhiTrend && Math.abs(driver.dhiTrend.change) >= 1 && (
+                  <p className="text-xs mt-1">
+                    {driver.dhiTrend.direction === 'up' ? 'Improving' : 
+                     driver.dhiTrend.direction === 'down' ? 'Declining' : 'Stable'}: 
+                    {driver.dhiTrend.direction === 'up' ? '+' : 
+                     driver.dhiTrend.direction === 'down' ? '-' : ''}
+                    {Math.abs(driver.dhiTrend.change)}%
+                  </p>
+                )}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

@@ -8,6 +8,7 @@ export interface Driver {
   avatar: string;
   dhi?: number; // Drive Health Index
   dhiExplanation?: string; // Explanation of DHI score
+  dhiTrend?: { change: number; direction: 'up' | 'down' | 'stable' }; // DHI trend information
 }
 
 export const getStatusColor = (status: string) => {
@@ -36,4 +37,31 @@ export const getDHIStatusColor = (dhiScore: number | undefined): string => {
   if (dhiScore >= 60) return 'bg-yellow-500';
   if (dhiScore >= 40) return 'bg-orange-500';
   return 'bg-red-500';
+};
+
+/**
+ * Get DHI trend icon and color
+ */
+export const getDHITrendInfo = (trend?: { change: number; direction: 'up' | 'down' | 'stable' }) => {
+  if (!trend) return { icon: '', colorClass: '' };
+  
+  let icon = '';
+  let colorClass = '';
+  
+  switch (trend.direction) {
+    case 'up':
+      icon = '↑';
+      colorClass = 'text-green-500';
+      break;
+    case 'down':
+      icon = '↓';
+      colorClass = 'text-red-500';
+      break;
+    case 'stable':
+      icon = '→';
+      colorClass = 'text-blue-500';
+      break;
+  }
+  
+  return { icon, colorClass };
 };

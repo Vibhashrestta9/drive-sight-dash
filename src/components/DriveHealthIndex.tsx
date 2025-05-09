@@ -1,30 +1,56 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
-import { InfoIcon } from 'lucide-react';
+import { InfoIcon, ChartLine } from 'lucide-react';
 import { RMDEDrive } from '@/utils/rmdeUtils';
-import { calculateDHI, getDHIStatus, getDHIStatusColor, explainDHIScore, DEFAULT_DHI_WEIGHTS } from '@/utils/dhiUtils';
+import { 
+  calculateDHI, 
+  getDHIStatus, 
+  getDHIStatusColor, 
+  explainDHIScore, 
+  DEFAULT_DHI_WEIGHTS,
+  getDHIBreakdown,
+  calculateDHITrend
+} from '@/utils/dhiUtils';
 
 interface DriveHealthIndexProps {
   drives: RMDEDrive[];
 }
 
 const DriveHealthIndex = ({ drives }: DriveHealthIndexProps) => {
+  const [selectedDriveId, setSelectedDriveId] = useState<number | null>(null);
+  
   // Calculate DHI for all drives
-  const drivesWithDHI = drives.map(drive => ({
-    ...drive,
-    dhi: calculateDHI(drive),
-    dhiExplanation: explainDHIScore(drive, calculateDHI(drive))
-  }));
+  const drivesWithDHI = drives.map(drive => {
+    const dhi = calculateDHI(drive);
+    const trend = calculateDHITrend(dhi, drive.previousDHI || dhi);
+    return {
+      ...drive,
+      dhi,
+      dhiExplanation: explainDHIScore(drive, dhi),
+      dhiBreakdown: getDHIBreakdown(drive),
+      dhiTrend: trend
+    };
+  });
+  
+  // Get selected drive or null
+  const selectedDrive = selectedDriveId ? 
+    drivesWithDHI.find(d => d.id === selectedDriveId) : null;
   
   // Calculate fleet average DHI
   const averageDHI = Math.round(
     drivesWithDHI.reduce((sum, drive) => sum + drive.dhi, 0) / drivesWithDHI.length
   );
+  
+  // Calculate fleet DHI trend
+  const fleetPreviousAvg = Math.round(
+    drivesWithDHI.reduce((sum, drive) => sum + (drive.previousDHI || drive.dhi), 0) / drivesWithDHI.length
+  );
+  const fleetTrend = calculateDHITrend(averageDHI, fleetPreviousAvg);
   
   // Group drives by DHI status
   const dhiByStatus = {
@@ -51,7 +77,7 @@ const DriveHealthIndex = ({ drives }: DriveHealthIndexProps) => {
                 </div>
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
-                <p>DHI is a unified health score (0-100) based on temperature, efficiency, operating time, error frequency, and performance consistency.</p>
+                <p>DHI is a unified health score (0-100) based on multiple metrics including temperature, efficiency, operating time, error frequency, vibration, response time, and load capacity.</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -60,12 +86,13 @@ const DriveHealthIndex = ({ drives }: DriveHealthIndexProps) => {
       <CardContent>
         <Tabs defaultValue="overview">
           <TabsList className="mb-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="overview">Fleet Overview</TabsTrigger>
             <TabsTrigger value="breakdown">Drive Breakdown</TabsTrigger>
+            <TabsTrigger value="details">Drive Details</TabsTrigger>
             <TabsTrigger value="factors">DHI Factors</TabsTrigger>
           </TabsList>
           
-          {/* Overview Tab */}
+          {/* Fleet Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
             {/* Fleet Average */}
             <div className="flex flex-col items-center">
@@ -99,6 +126,15 @@ const DriveHealthIndex = ({ drives }: DriveHealthIndexProps) => {
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <div className="text-3xl font-bold">{averageDHI}</div>
                   <div className="text-sm text-muted-foreground capitalize">{getDHIStatus(averageDHI)}</div>
+                  <div className={`text-xs flex items-center gap-1 ${
+                    fleetTrend.direction === 'up' ? 'text-green-500' : 
+                    fleetTrend.direction === 'down' ? 'text-red-500' : 
+                    'text-blue-500'
+                  }`}>
+                    {fleetTrend.direction === 'up' ? '↑' : 
+                     fleetTrend.direction === 'down' ? '↓' : '→'}
+                    {Math.abs(fleetTrend.change)}%
+                  </div>
                 </div>
               </div>
             </div>
@@ -114,15 +150,44 @@ const DriveHealthIndex = ({ drives }: DriveHealthIndexProps) => {
                 <StatusCount label="Critical" count={dhiByStatus.critical} color="bg-red-500" />
               </div>
             </div>
+            
+            {/* Fleet health summary */}
+            <div className="border p-4 rounded-lg bg-gray-50">
+              <div className="font-medium mb-2">Fleet Health Summary</div>
+              <div className="text-sm text-gray-600">
+                {dhiByStatus.critical > 0 && 
+                  <div className="text-red-500 font-medium mb-1">⚠️ {dhiByStatus.critical} drives in critical condition require immediate attention</div>
+                }
+                {dhiByStatus.poor > 0 && 
+                  <div className="text-orange-500 mb-1">⚠ {dhiByStatus.poor} drives showing poor health need investigation</div>
+                }
+                <div>
+                  {Math.round((dhiByStatus.excellent + dhiByStatus.good) / drivesWithDHI.length * 100)}% of fleet 
+                  is in good or excellent condition
+                </div>
+                <div>
+                  Fleet trend: {fleetTrend.direction === 'up' ? 'Improving' : 
+                               fleetTrend.direction === 'down' ? 'Declining' : 'Stable'} 
+                  ({fleetTrend.direction === 'up' ? '+' : fleetTrend.direction === 'down' ? '-' : ''}
+                  {Math.abs(fleetTrend.change)}%)
+                </div>
+              </div>
+            </div>
           </TabsContent>
           
-          {/* Breakdown Tab */}
+          {/* Drive Breakdown Tab */}
           <TabsContent value="breakdown">
             <div className="space-y-3">
               {drivesWithDHI
                 .sort((a, b) => b.dhi - a.dhi)
                 .map(drive => (
-                  <div key={drive.id} className="flex items-center justify-between p-3 border rounded-md">
+                  <div 
+                    key={drive.id} 
+                    className={`flex items-center justify-between p-3 border rounded-md cursor-pointer hover:bg-gray-50 ${
+                      selectedDriveId === drive.id ? 'ring-2 ring-primary' : ''
+                    }`}
+                    onClick={() => setSelectedDriveId(drive.id)}
+                  >
                     <div className="flex flex-col">
                       <div className="font-medium">{drive.name}</div>
                       <div className="text-xs text-muted-foreground">{drive.moduleId}</div>
@@ -143,11 +208,131 @@ const DriveHealthIndex = ({ drives }: DriveHealthIndexProps) => {
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
-                      <span className="font-medium text-right w-8">{drive.dhi}</span>
+                      <div className="flex items-center">
+                        <span className="font-medium text-right w-8">{drive.dhi}</span>
+                        {drive.dhiTrend && Math.abs(drive.dhiTrend.change) >= 1 && (
+                          <span className={`text-xs ml-1 ${
+                            drive.dhiTrend.direction === 'up' ? 'text-green-500' : 
+                            drive.dhiTrend.direction === 'down' ? 'text-red-500' : 
+                            'text-blue-500'
+                          }`}>
+                            {drive.dhiTrend.direction === 'up' ? '↑' : 
+                             drive.dhiTrend.direction === 'down' ? '↓' : '→'}
+                            {Math.abs(drive.dhiTrend.change)}%
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
             </div>
+          </TabsContent>
+          
+          {/* Drive Details Tab */}
+          <TabsContent value="details">
+            {selectedDrive ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-medium">{selectedDrive.name}</h3>
+                    <div className="text-sm text-muted-foreground">Module ID: {selectedDrive.moduleId}</div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className={`px-2 py-1 rounded text-white text-sm font-medium ${getDHIStatusColor(selectedDrive.dhi)}`}>
+                      DHI: {selectedDrive.dhi}
+                      {selectedDrive.dhiTrend && Math.abs(selectedDrive.dhiTrend.change) >= 1 && (
+                        <span className="ml-1">
+                          {selectedDrive.dhiTrend.direction === 'up' ? '↑' : 
+                           selectedDrive.dhiTrend.direction === 'down' ? '↓' : '→'}
+                          {Math.abs(selectedDrive.dhiTrend.change)}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="border rounded-md p-3 text-sm">
+                  {selectedDrive.dhiExplanation}
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <MetricCard 
+                    label="Temperature" 
+                    value={`${selectedDrive.temperature}°C`} 
+                    score={selectedDrive.dhiBreakdown.temperature} 
+                  />
+                  <MetricCard 
+                    label="Power Efficiency" 
+                    value={`${selectedDrive.efficiency}%`} 
+                    score={selectedDrive.dhiBreakdown.efficiency} 
+                  />
+                  <MetricCard 
+                    label="Operating Hours" 
+                    value={`${Math.floor(selectedDrive.operatingHours)}h`} 
+                    score={selectedDrive.dhiBreakdown.operatingHours} 
+                  />
+                  <MetricCard 
+                    label="Error Status" 
+                    value={`${selectedDrive.errors.length} errors`} 
+                    score={selectedDrive.dhiBreakdown.errors} 
+                  />
+                  {selectedDrive.responseTime && (
+                    <MetricCard 
+                      label="Response Time" 
+                      value={`${selectedDrive.responseTime}ms`} 
+                      score={selectedDrive.dhiBreakdown.responseTime} 
+                    />
+                  )}
+                  {selectedDrive.vibrationLevel && (
+                    <MetricCard 
+                      label="Vibration Level" 
+                      value={`${selectedDrive.vibrationLevel}mm/s`} 
+                      score={selectedDrive.dhiBreakdown.vibration} 
+                    />
+                  )}
+                  {selectedDrive.loadCapacity && (
+                    <MetricCard 
+                      label="Load Capacity" 
+                      value={`${selectedDrive.loadCapacity}%`} 
+                      score={selectedDrive.dhiBreakdown.loadCapacity} 
+                    />
+                  )}
+                </div>
+                
+                {selectedDrive.errors.length > 0 && (
+                  <div>
+                    <h4 className="font-medium mb-2">Recent Errors</h4>
+                    <div className="space-y-2">
+                      {selectedDrive.errors.map(error => (
+                        <div key={error.id} className="border rounded-md p-2 text-sm">
+                          <div className="flex items-center justify-between">
+                            <span className={`px-1.5 py-0.5 rounded text-xs ${
+                              error.severity === 'critical' ? 'bg-red-100 text-red-800' :
+                              error.severity === 'high' ? 'bg-orange-100 text-orange-800' :
+                              error.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-blue-100 text-blue-800'
+                            }`}>
+                              {error.severity}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {new Date(error.timestamp).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="mt-1">{error.message}</div>
+                          {error.resolved && (
+                            <div className="mt-1 text-xs text-green-600">✓ Resolved</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center p-8 text-muted-foreground">
+                Select a drive from the "Drive Breakdown" tab to view detailed metrics
+              </div>
+            )}
           </TabsContent>
           
           {/* Factors Tab */}
@@ -181,6 +366,21 @@ const DriveHealthIndex = ({ drives }: DriveHealthIndexProps) => {
                   label="Performance Consistency"
                   weight={DEFAULT_DHI_WEIGHTS.performanceConsistency}
                   description="Assesses stability and predictability of drive operation"
+                />
+                <FactorBar
+                  label="Response Time"
+                  weight={DEFAULT_DHI_WEIGHTS.responseTime}
+                  description="Measures how quickly the drive responds to commands"
+                />
+                <FactorBar
+                  label="Vibration Levels"
+                  weight={DEFAULT_DHI_WEIGHTS.vibrationLevels}
+                  description="Measures mechanical stability during operation"
+                />
+                <FactorBar
+                  label="Load Capacity"
+                  weight={DEFAULT_DHI_WEIGHTS.loadCapacity}
+                  description="Evaluates how efficiently the drive handles its workload"
                 />
               </div>
             </div>
@@ -222,5 +422,26 @@ const FactorBar = ({ label, weight, description }: { label: string, weight: numb
     </div>
   </div>
 );
+
+// Helper component for metric cards in drive details
+const MetricCard = ({ label, value, score }: { label: string, value: string, score: number }) => {
+  let scoreColor = '';
+  if (score >= 90) scoreColor = 'text-green-600';
+  else if (score >= 75) scoreColor = 'text-emerald-600';
+  else if (score >= 60) scoreColor = 'text-yellow-600';
+  else if (score >= 40) scoreColor = 'text-orange-600';
+  else scoreColor = 'text-red-600';
+  
+  return (
+    <div className="border rounded-md p-3">
+      <div className="text-sm text-muted-foreground">{label}</div>
+      <div className="flex justify-between items-center mt-1">
+        <div className="font-medium">{value}</div>
+        <div className={`font-medium ${scoreColor}`}>{score}</div>
+      </div>
+      <Progress value={score} className={`h-1.5 mt-2 ${getDHIStatusColor(score)}`} />
+    </div>
+  );
+};
 
 export default DriveHealthIndex;

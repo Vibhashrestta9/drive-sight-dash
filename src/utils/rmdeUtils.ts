@@ -10,6 +10,10 @@ interface RMDEDrive {
   lastMaintenance: string;
   healthScore: number;
   errors: RMDEError[];
+  responseTime?: number;
+  vibrationLevel?: number;
+  loadCapacity?: number;
+  previousDHI?: number;
 }
 
 interface RMDEError {
@@ -52,6 +56,11 @@ export const generateInitialRMDEData = (): RMDEDrive[] => {
                   healthScore > 80 ? 'warning' : 
                   healthScore > 70 ? 'error' : 'offline';
     
+    // Add new metrics
+    const responseTime = Math.floor(Math.random() * 150) + 50; // 50-200ms
+    const vibrationLevel = Number((Math.random() * 4.5 + 0.5).toFixed(2)); // 0.5-5.0mm/s
+    const loadCapacity = Math.floor(Math.random() * 40) + 60; // 60-100%
+    
     return {
       id: index + 1,
       name,
@@ -63,7 +72,11 @@ export const generateInitialRMDEData = (): RMDEDrive[] => {
       efficiency: Math.floor(Math.random() * 20) + 80, // 80-100%
       lastMaintenance: new Date(Date.now() - Math.floor(Math.random() * 30) * 86400000).toLocaleDateString(), // Random date in last 30 days
       healthScore,
-      errors: generateRandomErrors(Math.floor(Math.random() * 4)) // 0-3 errors
+      errors: generateRandomErrors(Math.floor(Math.random() * 4)), // 0-3 errors
+      responseTime,
+      vibrationLevel,
+      loadCapacity,
+      previousDHI: Math.floor(Math.random() * 15) + healthScore - 10 // Previous DHI score (varies slightly from current healthScore)
     };
   });
 };
@@ -109,12 +122,20 @@ export const updateRMDEData = (drives: RMDEDrive[]): RMDEDrive[] => {
       const powerChange = Math.random() * 20 - 10; // -10 to +10
       const efficiencyChange = Math.random() * 4 - 2; // -2 to +2
       
+      // Store current health score as previous DHI
+      const previousDHI = drive.healthScore;
+      
       let newHealthScore = drive.healthScore + (Math.random() * 6 - 3); // -3 to +3
       newHealthScore = Math.max(0, Math.min(100, newHealthScore));
       
       const newStatus = newHealthScore > 90 ? 'online' : 
                        newHealthScore > 80 ? 'warning' : 
                        newHealthScore > 70 ? 'error' : 'offline';
+      
+      // Update new metrics
+      const responseTimeChange = Math.random() * 40 - 20; // -20 to +20
+      const vibrationChange = Number((Math.random() * 0.6 - 0.3).toFixed(2)); // -0.3 to +0.3
+      const loadCapacityChange = Math.random() * 6 - 3; // -3 to +3
       
       // Add a new error occasionally
       let newErrors = [...drive.errors];
@@ -145,7 +166,14 @@ export const updateRMDEData = (drives: RMDEDrive[]): RMDEDrive[] => {
         healthScore: Math.round(newHealthScore),
         status: newStatus as 'online' | 'offline' | 'warning' | 'error',
         operatingHours: drive.operatingHours + 0.01,
-        errors: newErrors
+        errors: newErrors,
+        previousDHI,
+        responseTime: drive.responseTime ? 
+          Math.max(30, Math.min(250, drive.responseTime + responseTimeChange)) : undefined,
+        vibrationLevel: drive.vibrationLevel ? 
+          Number(Math.max(0.1, Math.min(7, drive.vibrationLevel + vibrationChange)).toFixed(2)) : undefined,
+        loadCapacity: drive.loadCapacity ? 
+          Math.max(40, Math.min(100, drive.loadCapacity + loadCapacityChange)) : undefined
       };
     }
     return drive;
