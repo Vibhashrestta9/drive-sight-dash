@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Network } from 'lucide-react';
+import { Network, Shield } from 'lucide-react';
 import DriveMetricsCards from '@/components/DriveMetricsCards';
 import PerformanceGraph from '@/components/PerformanceGraph';
 import LiveDrivers from '@/components/LiveDrivers';
@@ -30,13 +30,22 @@ const Index = () => {
             <h1 className="text-3xl font-bold text-gray-900">DriveSight Dashboard</h1>
             <p className="text-gray-600">Real-time monitoring and analytics for your fleet</p>
           </div>
-          <Link 
-            to="/sim-configuration" 
-            className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-          >
-            <Network className="h-5 w-5" />
-            SIM Configuration
-          </Link>
+          <div className="flex gap-3">
+            <Link 
+              to="/sim-configuration" 
+              className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+            >
+              <Network className="h-5 w-5" />
+              SIM Configuration
+            </Link>
+            <Link 
+              to="/cyber-security" 
+              className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+            >
+              <Shield className="h-5 w-5" />
+              Cybersecurity
+            </Link>
+          </div>
         </header>
 
         {/* Metrics Summary Cards */}
