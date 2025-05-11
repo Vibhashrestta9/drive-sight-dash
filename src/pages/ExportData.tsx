@@ -189,18 +189,14 @@ const ExportData = () => {
         const link = document.createElement('a');
         const fileName = `DriveSight_${sheetName}_${date}.csv`;
         
-        if (navigator.msSaveBlob) {
-          // IE 10+
-          navigator.msSaveBlob(blob, fileName);
-        } else {
-          // Other browsers
-          const url = URL.createObjectURL(blob);
-          link.href = url;
-          link.setAttribute('download', fileName);
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
+        // Fix for the msSaveBlob error - use standard download approach
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url); // Clean up
       });
       
       toast.success("Data successfully exported to CSV", {
