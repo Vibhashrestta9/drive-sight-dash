@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Network, Shield } from 'lucide-react';
+import { Network, Shield, Code } from 'lucide-react';
 import DriveMetricsCards from '@/components/DriveMetricsCards';
 import PerformanceGraph from '@/components/PerformanceGraph';
 import LiveDrivers from '@/components/LiveDrivers';
@@ -44,6 +44,13 @@ const Index = () => {
             >
               <Shield className="h-5 w-5" />
               Cybersecurity
+            </Link>
+            <Link 
+              to="/web-development" 
+              className="flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
+            >
+              <Code className="h-5 w-5" />
+              Web Development
             </Link>
           </div>
         </header>

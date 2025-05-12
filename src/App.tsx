@@ -10,6 +10,7 @@ import SimConfiguration from "./pages/SimConfiguration";
 import DigitalTwin from "./pages/DigitalTwin";
 import CyberSecurity from "./pages/CyberSecurity";
 import ExportData from "./pages/ExportData";
+import WebDevelopment from "./pages/WebDevelopment";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/digital-twin" element={<DigitalTwin />} />
           <Route path="/cyber-security" element={<CyberSecurity />} />
           <Route path="/export-data" element={<ExportData />} />
+          <Route path="/web-development" element={<WebDevelopment />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
