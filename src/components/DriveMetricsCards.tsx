@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowUp, ArrowDown, Gauge, Clock, Route, Fuel } from 'lucide-react';
+import { ArrowUp, ArrowDown, Gauge, Clock, Route, Fuel, CarFront } from 'lucide-react';
 
 interface MetricCardProps {
   title: string;
@@ -59,7 +59,6 @@ const DriveMetricsCards = () => {
   });
 
   useEffect(() => {
-    // Simulate live updates to the metrics
     const interval = setInterval(() => {
       setMetrics(prev => {
         const randomChange = (min: number, max: number) => {
@@ -87,7 +86,7 @@ const DriveMetricsCards = () => {
         title="Active Drivers"
         value={metrics.activeDrivers}
         description="Currently on the road"
-        icon={<Car className="h-4 w-4" />}
+        icon={<CarFront className="h-4 w-4" />}
         trend={{ direction: parseInt(metrics.activeDrivers) >= 15 ? 'up' : 'down', percentage: '8% from yesterday' }}
       />
       <MetricCard

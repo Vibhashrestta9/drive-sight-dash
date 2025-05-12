@@ -1,85 +1,98 @@
-
 import React, { useState, useEffect } from 'react';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar } from '@/components/ui/avatar';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Car, MapPin, Activity } from 'lucide-react';
-
-interface Driver {
-  id: number;
-  name: string;
-  status: 'active' | 'idle' | 'offline';
-  location: string;
-  lastUpdate: string;
-  avatar: string;
-}
+import { useToast } from '@/hooks/use-toast';
+import { Check, XCircle } from 'lucide-react';
+import { sendEmailAlert } from '@/utils/alertUtils';
+import { AlertSettings } from './AlertSettingsDialog';
+import { Driver } from '@/types/driverTypes';
+import DriverList from './drivers/DriverList';
+import AlertControls from './drivers/AlertControls';
 
 const LiveDrivers = () => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
+  const [criticalAlerts, setCriticalAlerts] = useState<Driver[]>([]);
+  const { toast } = useToast();
+  
+  const [alertSettings, setAlertSettings] = useState<AlertSettings>({
+    enabled: false,
+    emailAddress: '',
+    sendSMS: false,
+    phoneNumber: '',
+    sendgridApiKey: '',
+    senderEmail: '',
+  });
+  
+  const [sendingAlert, setSendingAlert] = useState(false);
 
-  // Simulate fetching live driver data
   useEffect(() => {
-    // Initial data
     const initialDrivers: Driver[] = [
       { 
         id: 1, 
-        name: 'Alex Johnson', 
+        name: 'GIRISHA CD', 
         status: 'active', 
         location: 'Downtown', 
         lastUpdate: '2 min ago',
-        avatar: 'AJ'
+        avatar: 'GC'
       },
       { 
         id: 2, 
-        name: 'Sarah Williams', 
+        name: 'MOHAN', 
         status: 'active', 
         location: 'Highway 101', 
         lastUpdate: '5 min ago',
-        avatar: 'SW'
+        avatar: 'M'
       },
       { 
         id: 3, 
-        name: 'Michael Chen', 
+        name: 'BABITHA', 
         status: 'idle', 
         location: 'Central Park', 
         lastUpdate: '10 min ago',
-        avatar: 'MC'
+        avatar: 'B'
       },
       { 
         id: 4, 
-        name: 'Rachel Green', 
+        name: 'ANATH N', 
         status: 'offline', 
         location: 'Last: Airport Rd', 
         lastUpdate: '1 hour ago',
-        avatar: 'RG'
+        avatar: 'AN'
       },
       { 
         id: 5, 
-        name: 'David Lopez', 
+        name: 'VIBHA SHRESTTA', 
         status: 'active', 
         location: 'Main Street', 
         lastUpdate: '4 min ago',
-        avatar: 'DL'
+        avatar: 'VS'
       }
     ];
-    
+
     setDrivers(initialDrivers);
     setLoading(false);
 
-    // Simulate live updates
     const interval = setInterval(() => {
       setDrivers(prevDrivers => {
         return prevDrivers.map(driver => {
-          // Randomly update some drivers' status and location
           if (Math.random() > 0.7) {
-            const statuses: ('active' | 'idle' | 'offline')[] = ['active', 'idle', 'offline'];
+            const statuses: ('active' | 'idle' | 'offline' | 'critical')[] = ['active', 'idle', 'offline', 'critical'];
             const locations = ['Downtown', 'Highway 101', 'Main Street', 'Broadway', 'Riverside Drive', 'Market Street'];
             const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
             const randomLocation = locations[Math.floor(Math.random() * locations.length)];
             const timeUpdates = ['Just now', '1 min ago', '2 min ago', '5 min ago'];
             const randomTime = timeUpdates[Math.floor(Math.random() * timeUpdates.length)];
+            
+            if (randomStatus === 'critical' && driver.status !== 'critical') {
+              const updatedDriver = {
+                ...driver,
+                status: randomStatus,
+                location: randomLocation,
+                lastUpdate: randomTime
+              };
+              
+              handleCriticalAlert(updatedDriver);
+            }
             
             return {
               ...driver,
@@ -96,16 +109,171 @@ const LiveDrivers = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-500';
-      case 'idle':
-        return 'bg-yellow-500';
-      case 'offline':
-        return 'bg-gray-500';
-      default:
-        return 'bg-gray-500';
+  useEffect(() => {
+    const criticalDrivers = drivers.filter(driver => driver.status === 'critical');
+    setCriticalAlerts(criticalDrivers);
+  }, [drivers]);
+
+  const handleCriticalAlert = async (driver: Driver) => {
+    toast({
+      title: "CRITICAL ALERT!",
+      description: `${driver.name} is in critical condition at ${driver.location}`,
+      variant: "destructive",
+    });
+    
+    if (alertSettings.enabled && alertSettings.emailAddress) {
+      setSendingAlert(true);
+      
+      try {
+        toast({
+          title: "Sending Alert Email",
+          description: `Sending notification to ${alertSettings.emailAddress}`
+        });
+        
+        if (alertSettings.sendgridApiKey && alertSettings.senderEmail) {
+          const success = await sendEmailAlert(
+            {
+              driverName: driver.name,
+              location: driver.location,
+              timestamp: new Date().toLocaleString(),
+              status: driver.status
+            }, 
+            alertSettings.emailAddress,
+            {
+              sendgridApiKey: alertSettings.sendgridApiKey,
+              senderEmail: alertSettings.senderEmail
+            }
+          );
+          
+          if (success) {
+            toast({
+              title: "Alert Email Sent",
+              description: `Notification sent to ${alertSettings.emailAddress}`
+            });
+          } else {
+            toast({
+              title: "Failed to Send Alert",
+              description: "Could not send email notification. Check your console logs for details.",
+              variant: "destructive"
+            });
+          }
+        } else {
+          toast({
+            title: "SendGrid Configuration Missing",
+            description: "Please configure SendGrid API key and sender email in Alert Settings",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error sending alert:", error);
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred while sending the alert. Check console for details.",
+          variant: "destructive"
+        });
+      } finally {
+        setSendingAlert(false);
+      }
+    } else if (alertSettings.enabled && !alertSettings.emailAddress) {
+      toast({
+        title: "Missing Email Address",
+        description: "Please set an email address in Alert Settings",
+        variant: "destructive"
+      });
+    }
+    
+    console.log(`Alert notification for ${driver.name} in critical condition`);
+  };
+
+  const simulateCriticalCondition = () => {
+    setDrivers(prevDrivers => {
+      const driverIndex = Math.floor(Math.random() * prevDrivers.length);
+      const updatedDrivers = [...prevDrivers];
+      const driver = {...updatedDrivers[driverIndex], status: 'critical' as const};
+      updatedDrivers[driverIndex] = driver;
+      
+      handleCriticalAlert(driver);
+      return updatedDrivers;
+    });
+  };
+
+  const handleSaveAlertSettings = (newSettings: AlertSettings) => {
+    setAlertSettings(newSettings);
+    localStorage.setItem('driveSightAlertSettings', JSON.stringify(newSettings));
+  };
+
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('driveSightAlertSettings');
+    if (savedSettings) {
+      try {
+        setAlertSettings(JSON.parse(savedSettings));
+      } catch (e) {
+        console.error("Failed to parse saved alert settings");
+      }
+    }
+  }, []);
+
+  const testSendEmail = async () => {
+    setSendingAlert(true);
+    try {
+      if (!alertSettings.enabled || !alertSettings.emailAddress) {
+        toast({
+          title: "Email Alerts Not Enabled",
+          description: "Please enable alerts and set an email address in Alert Settings",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      if (!alertSettings.sendgridApiKey || !alertSettings.senderEmail) {
+        toast({
+          title: "SendGrid Configuration Missing",
+          description: "Please configure SendGrid API key and sender email in Alert Settings",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        title: "Testing Email Alert",
+        description: "Sending a test email..."
+      });
+
+      const testSuccess = await sendEmailAlert(
+        {
+          driverName: "TEST DRIVER",
+          location: "Test Location",
+          timestamp: new Date().toLocaleString(),
+          status: "critical"
+        },
+        alertSettings.emailAddress,
+        {
+          sendgridApiKey: alertSettings.sendgridApiKey,
+          senderEmail: alertSettings.senderEmail
+        }
+      );
+
+      if (testSuccess) {
+        toast({
+          title: "Test Email Sent",
+          description: `A test notification was sent to ${alertSettings.emailAddress}`
+        });
+      } else {
+        toast({
+          title: "Test Email Failed",
+          description: "Failed to send test email. Please check console for details.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Error sending test email:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send test email. See console for details.",
+        variant: "destructive"
+      });
+    } finally {
+      setSendingAlert(false);
     }
   };
 
@@ -128,39 +296,19 @@ const LiveDrivers = () => {
             <CardTitle>Live Drivers</CardTitle>
             <CardDescription>Real-time driver status and locations</CardDescription>
           </div>
-          <Badge className="bg-green-500">{drivers.filter(d => d.status === 'active').length} Active</Badge>
+          <AlertControls 
+            criticalAlerts={criticalAlerts}
+            activeDrivers={drivers.filter(d => d.status === 'active').length}
+            onSimulateCritical={simulateCriticalCondition}
+            onTestEmail={testSendEmail}
+            onSaveSettings={handleSaveAlertSettings}
+            currentSettings={alertSettings}
+            sendingAlert={sendingAlert}
+          />
         </div>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[300px] pr-4">
-          <div className="space-y-4">
-            {drivers.map((driver) => (
-              <div key={driver.id} className="flex items-center justify-between p-3 bg-card rounded-lg border transition-all hover:bg-accent/20">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <div className="flex h-full w-full items-center justify-center bg-primary text-primary-foreground">
-                      {driver.avatar}
-                    </div>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-medium">{driver.name}</h3>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <MapPin size={14} />
-                      <span>{driver.location}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-1">
-                  <div className="flex items-center">
-                    <div className={`h-2 w-2 rounded-full ${getStatusColor(driver.status)} mr-2`}></div>
-                    <span className="text-sm font-medium capitalize">{driver.status}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{driver.lastUpdate}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
+        <DriverList drivers={drivers} />
       </CardContent>
     </Card>
   );
