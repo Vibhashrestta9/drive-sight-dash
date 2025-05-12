@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -20,11 +21,12 @@ const DriverPerformance = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Simulate data fetch
     const driverData: DriverData[] = [
       {
         id: 1,
-        name: 'GIRISHA CD',
-        avatar: 'GC',
+        name: 'Alex Johnson',
+        avatar: 'AJ',
         safetyScore: 92,
         avgSpeed: 34,
         distanceDriven: 152,
@@ -32,8 +34,8 @@ const DriverPerformance = () => {
       },
       {
         id: 2,
-        name: 'MOHAN',
-        avatar: 'M',
+        name: 'Sarah Williams',
+        avatar: 'SW',
         safetyScore: 88,
         avgSpeed: 38,
         distanceDriven: 134,
@@ -41,8 +43,8 @@ const DriverPerformance = () => {
       },
       {
         id: 3,
-        name: 'BABITHA',
-        avatar: 'B',
+        name: 'Michael Chen',
+        avatar: 'MC',
         safetyScore: 74,
         avgSpeed: 42,
         distanceDriven: 98,
@@ -50,8 +52,8 @@ const DriverPerformance = () => {
       },
       {
         id: 4,
-        name: 'ANATH N',
-        avatar: 'AN',
+        name: 'Rachel Green',
+        avatar: 'RG',
         safetyScore: 65,
         avgSpeed: 45,
         distanceDriven: 76,
@@ -59,21 +61,32 @@ const DriverPerformance = () => {
       },
       {
         id: 5,
-        name: 'VIBHA SHRESTTA',
-        avatar: 'VS',
+        name: 'David Lopez',
+        avatar: 'DL',
         safetyScore: 95,
         avgSpeed: 32,
         distanceDriven: 186,
         status: 'excellent'
+      },
+      {
+        id: 6,
+        name: 'Emma Thompson',
+        avatar: 'ET',
+        safetyScore: 82,
+        avgSpeed: 37,
+        distanceDriven: 124,
+        status: 'good'
       }
     ];
 
     setDrivers(driverData);
     setLoading(false);
 
+    // Simulate occasional updates to driver data
     const interval = setInterval(() => {
       setDrivers(prevDrivers => {
         return prevDrivers.map(driver => {
+          // Only update some drivers sometimes
           if (Math.random() > 0.7) {
             const newSafetyScore = Math.min(100, Math.max(50, driver.safetyScore + (Math.random() * 6 - 3)));
             const newAvgSpeed = Math.max(25, Math.min(50, driver.avgSpeed + (Math.random() * 4 - 2)));

@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,11 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import SimConfiguration from "./pages/SimConfiguration";
-import DigitalTwin from "./pages/DigitalTwin";
-import CyberSecurity from "./pages/CyberSecurity";
-import ExportData from "./pages/ExportData";
-import WebDevelopment from "./pages/WebDevelopment";
 
 const queryClient = new QueryClient();
 
@@ -22,11 +16,6 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/web-development" element={<WebDevelopment />} />
-          <Route path="/export-data" element={<ExportData />} />
-          <Route path="/sim-configuration" element={<SimConfiguration />} />
-          <Route path="/digital-twin" element={<DigitalTwin />} />
-          <Route path="/cyber-security" element={<CyberSecurity />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
