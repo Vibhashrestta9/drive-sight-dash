@@ -5,9 +5,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Code, Globe, Play, Save } from "lucide-react";
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Code, Play, Save, FileCode, Layout } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const WebDevelopment = () => {
@@ -53,126 +52,117 @@ const WebDevelopment = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="container mx-auto">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Web Development Tools</h1>
-          <p className="text-gray-600">Create and test web projects directly in your dashboard</p>
-        </header>
-        
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-4">
-            <Label htmlFor="project-name">Project Name:</Label>
-            <Input 
-              id="project-name" 
-              value={projectName} 
-              onChange={(e) => setProjectName(e.target.value)} 
-              className="w-64"
-            />
-          </div>
-          
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              onClick={saveProject}
-              className="flex items-center gap-2"
-            >
-              <Save className="h-4 w-4" /> Save
-            </Button>
-            <Button 
-              onClick={generatePreview}
-              className="flex items-center gap-2"
-            >
-              <Play className="h-4 w-4" /> Run
-            </Button>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="col-span-1">
-            <CardHeader>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Web Development Studio</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="col-span-1">
+          <CardHeader>
+            <div className="flex justify-between items-center">
               <CardTitle className="flex items-center gap-2">
                 <Code className="h-5 w-5" /> Code Editor
               </CardTitle>
-              <CardDescription>Write HTML, CSS and JavaScript</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="html" className="w-full">
-                <TabsList className="w-full">
-                  <TabsTrigger value="html" className="flex-1">HTML</TabsTrigger>
-                  <TabsTrigger value="css" className="flex-1">CSS</TabsTrigger>
-                  <TabsTrigger value="js" className="flex-1">JavaScript</TabsTrigger>
-                </TabsList>
-                <TabsContent value="html">
-                  <Textarea 
-                    value={htmlCode} 
-                    onChange={(e) => setHtmlCode(e.target.value)}
-                    className="min-h-[400px] font-mono"
-                    placeholder="Enter your HTML code here"
-                  />
-                </TabsContent>
-                <TabsContent value="css">
-                  <Textarea 
-                    value={cssCode} 
-                    onChange={(e) => setCssCode(e.target.value)}
-                    className="min-h-[400px] font-mono"
-                    placeholder="Enter your CSS code here" 
-                  />
-                </TabsContent>
-                <TabsContent value="js">
-                  <Textarea 
-                    value={jsCode} 
-                    onChange={(e) => setJsCode(e.target.value)}
-                    className="min-h-[400px] font-mono"
-                    placeholder="Enter your JavaScript code here" 
-                  />
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-          
-          <Card className="col-span-1">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5" /> Preview
-              </CardTitle>
-              <CardDescription>Live preview of your code</CardDescription>
-            </CardHeader>
-            <CardContent className="min-h-[400px] border rounded-md bg-white">
-              {preview ? (
-                <iframe 
-                  srcDoc={preview}
-                  title="preview"
-                  className="w-full h-[500px] border-0"
-                  sandbox="allow-scripts"
+              <div>
+                <Label htmlFor="project-name" className="mr-2">Project Name:</Label>
+                <Input 
+                  id="project-name" 
+                  value={projectName} 
+                  onChange={(e) => setProjectName(e.target.value)} 
+                  className="w-48 inline-block"
                 />
-              ) : (
-                <div className="flex items-center justify-center h-[500px] text-gray-400">
-                  <p>Click "Run" to see the preview</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div className="mt-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Templates</CardTitle>
-              <CardDescription>Quick-start with pre-built templates</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {['Landing Page', 'Blog Layout', 'Dashboard UI'].map((template) => (
-                  <Button key={template} variant="outline" className="h-24">
-                    {template}
-                  </Button>
-                ))}
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+            <CardDescription>Write HTML, CSS and JavaScript</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="html" className="w-full">
+              <TabsList className="w-full">
+                <TabsTrigger value="html" className="flex-1">HTML</TabsTrigger>
+                <TabsTrigger value="css" className="flex-1">CSS</TabsTrigger>
+                <TabsTrigger value="js" className="flex-1">JavaScript</TabsTrigger>
+              </TabsList>
+              <TabsContent value="html">
+                <Textarea 
+                  value={htmlCode} 
+                  onChange={(e) => setHtmlCode(e.target.value)}
+                  className="min-h-[400px] font-mono"
+                  placeholder="Enter your HTML code here"
+                />
+              </TabsContent>
+              <TabsContent value="css">
+                <Textarea 
+                  value={cssCode} 
+                  onChange={(e) => setCssCode(e.target.value)}
+                  className="min-h-[400px] font-mono"
+                  placeholder="Enter your CSS code here" 
+                />
+              </TabsContent>
+              <TabsContent value="js">
+                <Textarea 
+                  value={jsCode} 
+                  onChange={(e) => setJsCode(e.target.value)}
+                  className="min-h-[400px] font-mono"
+                  placeholder="Enter your JavaScript code here" 
+                />
+              </TabsContent>
+            </Tabs>
+            <div className="flex justify-end gap-2 mt-4">
+              <Button 
+                variant="outline" 
+                onClick={saveProject}
+                className="flex items-center gap-2"
+              >
+                <Save className="h-4 w-4" /> Save
+              </Button>
+              <Button 
+                onClick={generatePreview}
+                className="flex items-center gap-2"
+              >
+                <Play className="h-4 w-4" /> Run
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Layout className="h-5 w-5" /> Preview
+            </CardTitle>
+            <CardDescription>Live preview of your code</CardDescription>
+          </CardHeader>
+          <CardContent className="min-h-[400px] border rounded-md bg-white">
+            {preview ? (
+              <iframe 
+                srcDoc={preview}
+                title="preview"
+                className="w-full h-[500px] border-0"
+                sandbox="allow-scripts"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-[500px] text-gray-400">
+                <p>Click "Run" to see the preview</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
+      
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>Templates</CardTitle>
+          <CardDescription>Quick-start with pre-built templates</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {['Landing Page', 'Blog Layout', 'Dashboard UI', 'Portfolio', 'E-commerce', 'Personal Resume', 'Product Page', 'Contact Form'].map((template) => (
+              <Button key={template} variant="outline" className="h-20 text-center">
+                {template}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
