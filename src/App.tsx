@@ -10,6 +10,7 @@ import SimConfiguration from "./pages/SimConfiguration";
 import DigitalTwin from "./pages/DigitalTwin";
 import CyberSecurity from "./pages/CyberSecurity";
 import ExportData from "./pages/ExportData";
+import Neta21Manual from "./pages/Neta21Manual";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/digital-twin" element={<DigitalTwin />} />
           <Route path="/cyber-security" element={<CyberSecurity />} />
           <Route path="/export-data" element={<ExportData />} />
+          <Route path="/neta21-manual" element={<Neta21Manual />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
