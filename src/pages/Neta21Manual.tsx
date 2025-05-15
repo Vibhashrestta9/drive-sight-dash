@@ -191,7 +191,7 @@ const Neta21Manual = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Alert variant="warning" className="mb-4">
+              <Alert variant="destructive" className="mb-4">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Safety Warning</AlertTitle>
                 <AlertDescription>
@@ -252,7 +252,7 @@ const Neta21Manual = () => {
                 <div className="space-y-2">
                   <h3 className="font-medium">HTTP (Hypertext Transfer Protocol)</h3>
                   <p>Used for serving web pages. Recommended only for direct cable connections.</p>
-                  <Alert variant="warning" className="mt-2">
+                  <Alert variant="destructive" className="mt-2">
                     <AlertDescription>
                       Only use HTTP for direct cable connections due to security concerns.
                     </AlertDescription>
