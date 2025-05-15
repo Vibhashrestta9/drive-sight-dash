@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -98,8 +97,8 @@ const Neta21Manual = () => {
                   <AccordionContent>
                     <p className="mb-2">The NETA-21 firmware can be updated via ABB web pages. The process includes:</p>
                     <ol className="list-decimal ml-5 space-y-1">
-                      <li>Navigate to Settings > Firmware update in the web interface</li>
-                      <li>Download the latest firmware from ABB's website</li>
+                      <li>Navigate to Settings {'->'} Firmware update in the web interface</li>
+                      <li>Download the latest firmware from ABB&apos;s website</li>
                       <li>Upload the firmware file through the web interface</li>
                       <li>Follow the on-screen instructions to complete the update</li>
                     </ol>
@@ -112,10 +111,10 @@ const Neta21Manual = () => {
                     <p className="mb-2">To change your password:</p>
                     <ol className="list-decimal ml-5 space-y-1">
                       <li>Click on your username in the top-right corner</li>
-                      <li>Select "My Details"</li>
+                      <li>Select &quot;My Details&quot;</li>
                       <li>Enter your old password and new password</li>
                       <li>Confirm the new password</li>
-                      <li>Click "Save" to apply the changes</li>
+                      <li>Click &quot;Save&quot; to apply the changes</li>
                     </ol>
                   </AccordionContent>
                 </AccordionItem>
@@ -125,11 +124,11 @@ const Neta21Manual = () => {
                   <AccordionContent>
                     <p className="mb-2">To add new users to the system:</p>
                     <ol className="list-decimal ml-5 space-y-1">
-                      <li>Navigate to Settings > User management</li>
-                      <li>Click the "Add" button</li>
+                      <li>Navigate to Settings {'->'} User management</li>
+                      <li>Click the &quot;Add&quot; button</li>
                       <li>Fill in the required user details</li>
                       <li>Select the appropriate user role</li>
-                      <li>Click "Save" to create the user</li>
+                      <li>Click &quot;Save&quot; to create the user</li>
                     </ol>
                   </AccordionContent>
                 </AccordionItem>
@@ -159,9 +158,9 @@ const Neta21Manual = () => {
                   <AccordionContent>
                     <p className="mb-2">To set the location of the NETA-21:</p>
                     <ol className="list-decimal ml-5 space-y-1">
-                      <li>Navigate to Settings > User interface</li>
+                      <li>Navigate to Settings {'->'} User interface</li>
                       <li>Enter the location information in the designated field</li>
-                      <li>Click "Save" to apply the changes</li>
+                      <li>Click &quot;Save&quot; to apply the changes</li>
                     </ol>
                   </AccordionContent>
                 </AccordionItem>
@@ -171,12 +170,12 @@ const Neta21Manual = () => {
                   <AccordionContent>
                     <p className="mb-2">To configure network settings:</p>
                     <ol className="list-decimal ml-5 space-y-1">
-                      <li>Navigate to Settings > Network interfaces</li>
+                      <li>Navigate to Settings {'->'} Network interfaces</li>
                       <li>Select the appropriate Ethernet tab</li>
                       <li>Choose between automatic (DHCP) or static IP configuration</li>
                       <li>Enter the necessary network parameters if using static IP</li>
                       <li>Configure DHCP server mode if needed</li>
-                      <li>Click "Save" to apply the settings</li>
+                      <li>Click &quot;Save&quot; to apply the settings</li>
                     </ol>
                   </AccordionContent>
                 </AccordionItem>
