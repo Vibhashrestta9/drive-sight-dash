@@ -83,9 +83,18 @@ const DriveModel = ({ drive }: { drive: RMDEDrive }) => {
       
       {/* Name label */}
       <Billboard position={[0, 0.85, 0]}>
-        <Text fontSize={0.15} color="#ffffff" backgroundColor="#000000" paddingX={0.05}>
-          {drive.name}
-        </Text>
+        {/* Fix: Replace backgroundColor with a custom solution */}
+        <group>
+          {/* Background plane for text */}
+          <mesh position={[0, 0, -0.01]}>
+            <planeGeometry args={[1, 0.2]} />
+            <meshBasicMaterial color="#000000" />
+          </mesh>
+          {/* Text component without the backgroundColor prop */}
+          <Text fontSize={0.15} color="#ffffff" paddingX={0.05}>
+            {drive.name}
+          </Text>
+        </group>
       </Billboard>
       
       {/* Data visualization */}
