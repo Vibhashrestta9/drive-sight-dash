@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ZapparCamera, ImageTracker } from '@zappar/zappar-react-three-fiber';
 import { Text, Box, Billboard, Html } from '@react-three/drei';
-import { RMDEDrive } from '@/utils/rmdeUtils';
+import { RMDEDrive } from '@/utils/types/rmdeTypes';
 import * as THREE from 'three';
 
 interface ARSceneProps {

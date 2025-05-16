@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Text, Box, Stats } from '@react-three/drei';
@@ -11,7 +12,13 @@ import { ArrowLeft, Camera, QrCode, RefreshCw, Shield, CheckCircle, AlertTriangl
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
-import { generateInitialRMDEData, updateRMDEData } from '@/utils/rmdeUtils';
+import { 
+  generateInitialRMDEData, 
+  updateRMDEData,
+  getStatusBadgeClass,
+  getHealthColor, 
+  RMDEDrive 
+} from '@/utils/rmdeUtils';
 import SelfHealingSystem from '@/components/SelfHealingSystem';
 import DriveQRCodeGenerator from '@/components/DriveQRCodeGenerator';
 

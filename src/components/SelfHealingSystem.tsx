@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { RMDEDrive, RMDEError } from '@/utils/rmdeUtils';
+import { RMDEDrive, RMDEError } from '@/utils/types/rmdeTypes';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, AlertTriangle, Clock, RefreshCw, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
