@@ -90,8 +90,8 @@ const DriveModel = ({ drive }: { drive: RMDEDrive }) => {
             <planeGeometry args={[1, 0.2]} />
             <meshBasicMaterial color="#000000" />
           </mesh>
-          {/* Text component without the backgroundColor prop */}
-          <Text fontSize={0.15} color="#ffffff" paddingX={0.05}>
+          {/* Text component without the paddingX prop */}
+          <Text fontSize={0.15} color="#ffffff">
             {drive.name}
           </Text>
         </group>
