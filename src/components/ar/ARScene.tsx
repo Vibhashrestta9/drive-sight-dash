@@ -15,7 +15,7 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
   
   return (
     <>
-      <ZapparCamera />
+      <ZapparCamera makeDefault />
       <directionalLight position={[0, 5, 10]} intensity={1.0} />
       <ambientLight intensity={0.5} />
       
@@ -24,6 +24,9 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
         <ImageTracker
           key={drive.id.toString()}
           targetImage={targetFile}
+          onNotVisible={() => console.log(`Target for drive ${drive.id} not visible`)}
+          onNewAnchor={(anchor) => console.log(`New anchor for drive ${drive.id}`)}
+          onVisible={() => console.log(`Target for drive ${drive.id} visible`)}
         >
           <DriveModel drive={drive} />
         </ImageTracker>
