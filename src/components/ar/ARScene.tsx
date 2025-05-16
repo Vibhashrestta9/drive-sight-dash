@@ -22,12 +22,8 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
       {/* Multiple trackers for each drive QR code */}
       {drives.map((drive) => (
         <ImageTracker
-          key={drive.id}
+          key={drive.id.toString()}
           targetImage={targetFile}
-          visible={true}
-          onNotVisible={() => console.log("Target lost")}
-          onNewAnchor={(anchor) => console.log("New anchor", anchor)}
-          onVisible={() => console.log(`Target for ${drive.name} found`)}
         >
           <DriveModel drive={drive} />
         </ImageTracker>

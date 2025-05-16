@@ -37,15 +37,15 @@ const SelfHealingSystem: React.FC<SelfHealingSystemProps> = ({ drives, onHeal })
       drive.errors.forEach(error => {
         // Only try to heal unresolved errors that aren't already being processed
         if (!error.resolved && 
-            !healingOperations.some(op => op.driveId === drive.id && op.errorId === error.id) &&
-            !completedOperations.some(op => op.driveId === drive.id && op.errorId === error.id)) {
+            !healingOperations.some(op => op.driveId === drive.id.toString() && op.errorId === error.id.toString()) &&
+            !completedOperations.some(op => op.driveId === drive.id.toString() && op.errorId === error.id.toString())) {
           
           // Create a new healing operation
           const newOperation: HealingOperation = {
             id: `${drive.id}-${error.id}-${Date.now()}`,
-            driveId: drive.id,
+            driveId: drive.id.toString(),
             driveName: drive.name,
-            errorId: error.id,
+            errorId: error.id.toString(),
             errorMessage: error.message,
             status: 'in_progress',
             progress: 0,
@@ -55,7 +55,7 @@ const SelfHealingSystem: React.FC<SelfHealingSystemProps> = ({ drives, onHeal })
           };
           
           setHealingOperations(prev => [...prev, newOperation]);
-          onHeal(drive.id, error.id);
+          onHeal(drive.id.toString(), error.id.toString());
           
           toast({
             title: "Auto-Healing Initiated",
@@ -137,8 +137,8 @@ const SelfHealingSystem: React.FC<SelfHealingSystemProps> = ({ drives, onHeal })
   
   const getSeverityFailureProbability = (op: HealingOperation): number => {
     // Get error from drives data
-    const drive = drives.find(d => d.id === op.driveId);
-    const error = drive?.errors.find(e => e.id === op.errorId);
+    const drive = drives.find(d => d.id.toString() === op.driveId);
+    const error = drive?.errors.find(e => e.id.toString() === op.errorId);
     
     if (!error) return 0.5;
     

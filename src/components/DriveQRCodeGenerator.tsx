@@ -13,7 +13,7 @@ interface DriveQRCodeGeneratorProps {
 }
 
 const DriveQRCodeGenerator: React.FC<DriveQRCodeGeneratorProps> = ({ drives }) => {
-  const [selectedDrive, setSelectedDrive] = useState<string>(drives[0]?.id || '');
+  const [selectedDrive, setSelectedDrive] = useState<string>(drives[0]?.id.toString() || '');
   
   const downloadQRCode = (driveName: string) => {
     const canvas = document.getElementById(`qr-${driveName}`) as HTMLElement;
@@ -33,7 +33,7 @@ const DriveQRCodeGenerator: React.FC<DriveQRCodeGeneratorProps> = ({ drives }) =
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
     
-    const selectedDriveObj = drives.find(d => d.id === selectedDrive);
+    const selectedDriveObj = drives.find(d => d.id.toString() === selectedDrive);
     if (!selectedDriveObj) return;
     
     const qrCode = document.getElementById(`qr-${selectedDriveObj.id}`) as HTMLElement;
@@ -71,7 +71,7 @@ const DriveQRCodeGenerator: React.FC<DriveQRCodeGeneratorProps> = ({ drives }) =
             <div class="info">
               <p><strong>Drive:</strong> ${selectedDriveObj.name}</p>
               <p><strong>Module:</strong> ${selectedDriveObj.moduleId}</p>
-              <p><strong>ID:</strong> ${selectedDriveObj.id}</p>
+              <p><strong>ID:</strong> ${selectedDriveObj.id.toString()}</p>
               <p>Scan with DriveSight AR Dashboard</p>
             </div>
           </div>
@@ -91,14 +91,14 @@ const DriveQRCodeGenerator: React.FC<DriveQRCodeGeneratorProps> = ({ drives }) =
       <Tabs defaultValue={selectedDrive} onValueChange={setSelectedDrive}>
         <TabsList className="grid" style={{ gridTemplateColumns: `repeat(${Math.min(drives.length, 5)}, 1fr)` }}>
           {drives.slice(0, 5).map((drive) => (
-            <TabsTrigger key={drive.id} value={drive.id}>
+            <TabsTrigger key={drive.id.toString()} value={drive.id.toString()}>
               {drive.name}
             </TabsTrigger>
           ))}
         </TabsList>
         
         {drives.map((drive) => (
-          <TabsContent key={drive.id} value={drive.id} className="mt-4">
+          <TabsContent key={drive.id.toString()} value={drive.id.toString()} className="mt-4">
             <div className="flex flex-col md:flex-row gap-6 items-center">
               {/* QR Code */}
               <div className="flex-shrink-0 border p-4 rounded-md bg-white">
@@ -151,7 +151,7 @@ const DriveQRCodeGenerator: React.FC<DriveQRCodeGeneratorProps> = ({ drives }) =
                     variant="outline" 
                     size="sm" 
                     className="flex items-center gap-2"
-                    onClick={() => downloadQRCode(drive.id)}
+                    onClick={() => downloadQRCode(drive.id.toString())}
                   >
                     <Download className="h-4 w-4" />
                     Download QR
