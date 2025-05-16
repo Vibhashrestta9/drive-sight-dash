@@ -11,6 +11,7 @@ import DigitalTwin from "./pages/DigitalTwin";
 import CyberSecurity from "./pages/CyberSecurity";
 import ExportData from "./pages/ExportData";
 import Neta21Manual from "./pages/Neta21Manual";
+import ARDashboard from "./pages/ARDashboard";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/cyber-security" element={<CyberSecurity />} />
           <Route path="/export-data" element={<ExportData />} />
           <Route path="/neta21-manual" element={<Neta21Manual />} />
+          <Route path="/ar-dashboard" element={<ARDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
