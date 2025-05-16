@@ -10,7 +10,9 @@ import RMDEDashboard from '@/components/RMDEDashboard';
 import DriveHealthIndex from '@/components/DriveHealthIndex';
 import BehavioralFingerprint from '@/components/BehavioralFingerprint';
 import DigitalTwinStatus from '@/components/DigitalTwinStatus';
-import { generateInitialRMDEData } from '@/utils/rmdeUtils';
+import SelfHealingSystem from '@/components/SelfHealingSystem';
+import { generateInitialRMDEData } from '@/utils/rmde/dataGenerator';
+import { updateRMDEData } from '@/utils/rmde/dataUpdater';
 import { useState, useEffect } from 'react';
 
 const Index = () => {
@@ -20,7 +22,31 @@ const Index = () => {
     // This ensures we have consistent data across components
     const initialData = generateInitialRMDEData();
     setRmdeData(initialData);
+    
+    // Set up interval for real-time updates
+    const interval = setInterval(() => {
+      setRmdeData(prev => updateRMDEData(prev));
+    }, 5000);
+    
+    return () => clearInterval(interval);
   }, []);
+  
+  const handleHeal = (driveId: string, errorId: string) => {
+    setRmdeData(prevData => {
+      return prevData.map(drive => {
+        if (drive.id.toString() === driveId) {
+          const updatedErrors = drive.errors.map(error => {
+            if (error.id.toString() === errorId) {
+              return { ...error, resolved: true };
+            }
+            return error;
+          });
+          return { ...drive, errors: updatedErrors };
+        }
+        return drive;
+      });
+    });
+  };
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -68,6 +94,9 @@ const Index = () => {
             <LiveDrivers />
           </div>
         </div>
+        
+        {/* Self Healing System */}
+        <SelfHealingSystem drives={rmdeData} onHeal={handleHeal} />
         
         {/* Digital Twin Status Section */}
         <div className="mb-6">

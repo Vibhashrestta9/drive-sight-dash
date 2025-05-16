@@ -52,14 +52,12 @@ import {
   RMDEDrive, 
   RMDEError, 
   RMDEModule,
-  RMDESystemStatus,
-  generateInitialRMDEData, 
-  updateRMDEData, 
-  getStatusBadgeClass,
-  getHealthColor,
-  generateNETAModules,
-  generateRMDESystemStatus
-} from '@/utils/rmdeUtils';
+  RMDESystemStatus 
+} from '@/utils/types/rmdeTypes';
+import { generateInitialRMDEData } from '@/utils/rmde/dataGenerator';
+import { updateRMDEData } from '@/utils/rmde/dataUpdater';
+import { getStatusBadgeClass, getHealthColor } from '@/utils/rmde/uiUtils';
+import { generateNETAModules, generateRMDESystemStatus } from '@/utils/rmde/dataGenerator';
 
 const RMDEDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
