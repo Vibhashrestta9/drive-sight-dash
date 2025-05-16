@@ -87,7 +87,9 @@ const Index = () => {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Performance Graph (Takes 2/3 width on large screens) */}
-          <PerformanceGraph />
+          <div className="lg:col-span-2">
+            <PerformanceGraph />
+          </div>
 
           {/* Driver List (Takes 1/3 width on large screens) */}
           <div className="grid grid-cols-1 gap-6">
@@ -96,7 +98,9 @@ const Index = () => {
         </div>
         
         {/* Self Healing System */}
-        <SelfHealingSystem drives={rmdeData} onHeal={handleHeal} />
+        <div className="mb-6">
+          <SelfHealingSystem drives={rmdeData} onHeal={handleHeal} />
+        </div>
         
         {/* Digital Twin Status Section */}
         <div className="mb-6">
