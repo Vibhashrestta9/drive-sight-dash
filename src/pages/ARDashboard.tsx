@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ArrowLeft, Camera, QrCode, RefreshCw, Shield, CheckCircle, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Camera, QrCode, RefreshCw, Shield, CheckCircle, AlertTriangle, ScanLine } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
@@ -184,12 +184,14 @@ const ARDashboard = () => {
     try {
       if (!arMode) {
         setArMode(true);
+        setActiveTab('ar'); // Automatically switch to AR tab
         toast({
           title: "AR Mode Enabled",
           description: "Point your camera at a QR code to visualize drive data",
         });
       } else {
         setArMode(false);
+        setActiveTab('dashboard');
       }
     } catch (error) {
       console.error("AR mode error:", error);
@@ -244,7 +246,7 @@ const ARDashboard = () => {
             {arMode ? "Disable AR" : "Enable AR"}
           </Button>
           <Button
-            variant="outline"
+            variant={showQrGenerator ? "default" : "outline"}
             onClick={() => setShowQrGenerator(!showQrGenerator)}
             className="flex items-center gap-2"
           >
@@ -291,6 +293,17 @@ const ARDashboard = () => {
         <TabsContent value="ar" className="mt-4">
           {arMode ? (
             <div className="h-[600px] rounded-lg overflow-hidden border border-gray-200">
+              {/* AR instructions overlay */}
+              <div className="absolute z-10 top-4 left-4 right-4 bg-black/70 text-white p-3 rounded-lg">
+                <div className="flex items-center mb-1">
+                  <ScanLine className="h-4 w-4 mr-2" />
+                  <span className="font-semibold">Point camera at QR code</span>
+                </div>
+                <p className="text-xs opacity-80">
+                  Hold your device steady and point at the QR code to view drive data in AR
+                </p>
+              </div>
+              
               <Suspense fallback={<div className="flex h-full w-full items-center justify-center">Loading AR capabilities...</div>}>
                 {arError ? (
                   <div className="flex h-full w-full items-center justify-center bg-red-50 text-red-500">

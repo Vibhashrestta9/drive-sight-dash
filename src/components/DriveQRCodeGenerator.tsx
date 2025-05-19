@@ -15,15 +15,21 @@ interface DriveQRCodeGeneratorProps {
 const DriveQRCodeGenerator: React.FC<DriveQRCodeGeneratorProps> = ({ drives }) => {
   const [selectedDrive, setSelectedDrive] = useState<string>(drives[0]?.id.toString() || '');
   
-  const downloadQRCode = (driveName: string) => {
-    const canvas = document.getElementById(`qr-${driveName}`) as HTMLElement;
+  // Generate a simple unique code for each drive that can be easily detected
+  const generateDriveCode = (drive: RMDEDrive) => {
+    // Create a simple URL-like format that's easy to parse and scan
+    return `drivesight://drive/${drive.id}/${drive.moduleId}`;
+  };
+  
+  const downloadQRCode = (driveId: string) => {
+    const canvas = document.getElementById(`qr-${driveId}`) as HTMLElement;
     const svgData = new XMLSerializer().serializeToString(canvas);
     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
     const svgUrl = URL.createObjectURL(svgBlob);
     
     const downloadLink = document.createElement('a');
     downloadLink.href = svgUrl;
-    downloadLink.download = `${driveName}-QR.svg`;
+    downloadLink.download = `drive-${driveId}-QR.svg`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
@@ -100,15 +106,11 @@ const DriveQRCodeGenerator: React.FC<DriveQRCodeGeneratorProps> = ({ drives }) =
         {drives.map((drive) => (
           <TabsContent key={drive.id.toString()} value={drive.id.toString()} className="mt-4">
             <div className="flex flex-col md:flex-row gap-6 items-center">
-              {/* QR Code */}
+              {/* QR Code - using simpler format for better scanning */}
               <div className="flex-shrink-0 border p-4 rounded-md bg-white">
                 <QRCodeSVG 
                   id={`qr-${drive.id}`}
-                  value={JSON.stringify({
-                    id: drive.id,
-                    name: drive.name,
-                    moduleId: drive.moduleId
-                  })}
+                  value={generateDriveCode(drive)}
                   size={200}
                   level="H"
                   includeMargin={true}

@@ -1,6 +1,5 @@
-
 import React, { useEffect, useRef, useState } from 'react';
-import { ZapparCamera, ImageTracker } from '@zappar/zappar-react-three-fiber';
+import { ZapparCamera, ImageTracker, BarcodeTracker } from '@zappar/zappar-react-three-fiber';
 import { Text, Box, Billboard, Html } from '@react-three/drei';
 import { RMDEDrive } from '@/utils/types/rmdeTypes';
 import * as THREE from 'three';
@@ -13,6 +12,7 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
   // Use state to track if target file has been loaded
   const [targetFileLoaded, setTargetFileLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [scannedDriveId, setScannedDriveId] = useState<string | null>(null);
   
   // This would be your QR code target file
   const targetFile = "/qr-target.zpt";
@@ -34,6 +34,30 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
       });
   }, [targetFile]);
   
+  const handleQRFound = (data: string) => {
+    console.log("QR Code found:", data);
+    
+    try {
+      // Parse the QR code data using our simple format
+      // Expected format: drivesight://drive/[id]/[moduleId]
+      if (data.startsWith('drivesight://drive/')) {
+        const parts = data.split('/');
+        if (parts.length >= 4) {
+          const driveId = parts[3];
+          setScannedDriveId(driveId);
+          console.log("Found drive with ID:", driveId);
+        }
+      }
+    } catch (error) {
+      console.error("Error parsing QR data:", error);
+    }
+  };
+  
+  // Find the drive that matches the scanned QR code
+  const scannedDrive = scannedDriveId 
+    ? drives.find(drive => drive.id.toString() === scannedDriveId) 
+    : null;
+  
   if (errorMessage) {
     // Return a fallback if there's an error
     return (
@@ -54,7 +78,17 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
       <directionalLight position={[0, 5, 10]} intensity={1.0} />
       <ambientLight intensity={0.5} />
       
-      {/* Only render trackers if target file is loaded */}
+      {/* Use BarcodeTracker for QR codes */}
+      <BarcodeTracker
+        onNewBarcode={(data) => handleQRFound(data)}
+        onBarcodeUpdate={(data) => console.log("Barcode updated:", data)}
+        onBarcodeVisible={() => console.log("Barcode visible")}
+        onBarcodeNotVisible={() => console.log("Barcode not visible")}
+      >
+        {scannedDrive && <DriveModel drive={scannedDrive} />}
+      </BarcodeTracker>
+      
+      {/* Keep the ImageTracker as a fallback */}
       {targetFileLoaded && drives.map((drive) => (
         <ImageTracker
           key={drive.id.toString()}
@@ -66,6 +100,15 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
           <DriveModel drive={drive} />
         </ImageTracker>
       ))}
+      
+      {/* Add a fallback message if no QR code is scanned */}
+      {!scannedDrive && (
+        <Billboard position={[0, 0, -3]}>
+          <Text color="white" fontSize={0.2} anchorX="center" anchorY="middle">
+            Scan a Drive QR code to view data
+          </Text>
+        </Billboard>
+      )}
     </>
   );
 };
@@ -118,14 +161,12 @@ const DriveModel = ({ drive }: { drive: RMDEDrive }) => {
       
       {/* Name label */}
       <Billboard position={[0, 0.85, 0]}>
-        {/* Fix: Replace backgroundColor with a custom solution */}
+        {/* Background plane for text */}
         <group>
-          {/* Background plane for text */}
           <mesh position={[0, 0, -0.01]}>
             <planeGeometry args={[1, 0.2]} />
             <meshBasicMaterial color="#000000" />
           </mesh>
-          {/* Text component without the paddingX prop */}
           <Text fontSize={0.15} color="#ffffff">
             {drive.name}
           </Text>
