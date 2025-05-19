@@ -16,6 +16,7 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
   const [targetFileLoaded, setTargetFileLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [scannedDriveId, setScannedDriveId] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   
   // This would be your QR code target file
   const targetFile = "/qr-target.zpt";
@@ -39,6 +40,7 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
   
   const handleQRFound = (data: string) => {
     console.log("QR Code found:", data);
+    setIsProcessing(true);
     
     try {
       // Parse the QR code data using our format
@@ -49,10 +51,34 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
           const driveId = parts[3];
           setScannedDriveId(driveId);
           console.log("Found drive with ID:", driveId);
+        } else {
+          setErrorMessage("Invalid QR code format");
+        }
+      } else {
+        // Handle legacy or incorrect format
+        try {
+          // Try parsing as direct ID
+          const possibleDriveId = data.trim();
+          const matchingDrive = drives.find(drive => drive.id.toString() === possibleDriveId);
+          
+          if (matchingDrive) {
+            setScannedDriveId(possibleDriveId);
+            console.log("Found drive with direct ID:", possibleDriveId);
+          } else {
+            setErrorMessage("QR code not recognized as a valid drive");
+            setTimeout(() => setErrorMessage(null), 3000);
+          }
+        } catch (e) {
+          setErrorMessage("Could not parse QR code data");
+          setTimeout(() => setErrorMessage(null), 3000);
         }
       }
     } catch (error) {
       console.error("Error parsing QR data:", error);
+      setErrorMessage("Error parsing QR code data");
+      setTimeout(() => setErrorMessage(null), 3000);
+    } finally {
+      setIsProcessing(false);
     }
   };
   
@@ -96,7 +122,7 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
       
       {/* Fallback display if no QR code is detected */}
       {!scannedDrive && (
-        <ARFallbackView isScanning={true} />
+        <ARFallbackView isScanning={!isProcessing} />
       )}
     </>
   );

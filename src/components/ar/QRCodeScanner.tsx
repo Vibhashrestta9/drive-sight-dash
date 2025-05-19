@@ -28,6 +28,7 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onQRCodeDetected }) => {
               if (barcodes.length > 0) {
                 // Parse the QR code data
                 const data = barcodes[0].rawValue;
+                console.log("QR Code detected:", data);
                 onQRCodeDetected(data);
               }
             } catch (error) {
@@ -43,6 +44,8 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onQRCodeDetected }) => {
         .catch(error => {
           console.error("Camera access error:", error);
         });
+    } else {
+      console.log("BarcodeDetector API not supported in this browser");
     }
   }, [onQRCodeDetected]);
   

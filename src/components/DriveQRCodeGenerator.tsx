@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Download, Printer } from 'lucide-react';
+import { Download, Printer, Info } from 'lucide-react';
 import { RMDEDrive } from '@/utils/rmdeUtils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface DriveQRCodeGeneratorProps {
   drives: RMDEDrive[];
@@ -169,6 +170,18 @@ const DriveQRCodeGenerator: React.FC<DriveQRCodeGeneratorProps> = ({ drives }) =
                     <Printer className="h-4 w-4" />
                     Print QR
                   </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <Info className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>These QR codes only work in the AR Dashboard</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
                 
                 <div className="text-sm text-gray-500 mt-2">
@@ -178,6 +191,7 @@ const DriveQRCodeGenerator: React.FC<DriveQRCodeGeneratorProps> = ({ drives }) =
                     <li>Enable AR mode in the dashboard</li>
                     <li>Hold your camera 8-12 inches from the QR code</li>
                     <li>Keep the camera steady until the data appears</li>
+                    <li><span className="text-red-500 font-medium">Do NOT</span> try to open this QR code in a web browser</li>
                   </ol>
                 </div>
               </div>
