@@ -106,14 +106,16 @@ const DriveQRCodeGenerator: React.FC<DriveQRCodeGeneratorProps> = ({ drives }) =
         {drives.map((drive) => (
           <TabsContent key={drive.id.toString()} value={drive.id.toString()} className="mt-4">
             <div className="flex flex-col md:flex-row gap-6 items-center">
-              {/* QR Code - using simpler format for better scanning */}
+              {/* QR Code - using higher quality for better scanning */}
               <div className="flex-shrink-0 border p-4 rounded-md bg-white">
                 <QRCodeSVG 
                   id={`qr-${drive.id}`}
                   value={generateDriveCode(drive)}
-                  size={200}
-                  level="H"
+                  size={250}
+                  level="H" // Highest error correction
                   includeMargin={true}
+                  bgColor="#FFFFFF"
+                  fgColor="#000000"
                 />
               </div>
               
@@ -169,9 +171,14 @@ const DriveQRCodeGenerator: React.FC<DriveQRCodeGeneratorProps> = ({ drives }) =
                   </Button>
                 </div>
                 
-                <div className="text-sm text-gray-500">
-                  Print this QR code and place it on or near the physical drive.
-                  Then use the AR Dashboard to scan it and view real-time data.
+                <div className="text-sm text-gray-500 mt-2">
+                  <p className="font-semibold mb-1">Scanning Instructions:</p>
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Print this QR code or display it on a well-lit screen</li>
+                    <li>Enable AR mode in the dashboard</li>
+                    <li>Hold your camera 8-12 inches from the QR code</li>
+                    <li>Keep the camera steady until the data appears</li>
+                  </ol>
                 </div>
               </div>
             </div>

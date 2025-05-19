@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ZapparCamera, ImageTracker, BarcodeTracker } from '@zappar/zappar-react-three-fiber';
+import { ZapparCamera, ImageTracker } from '@zappar/zappar-react-three-fiber';
 import { Text, Box, Billboard, Html } from '@react-three/drei';
 import { RMDEDrive } from '@/utils/types/rmdeTypes';
 import * as THREE from 'three';
@@ -32,13 +32,52 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
         console.error("Error loading target file:", error);
         setErrorMessage("Error loading QR target file");
       });
+      
+    // Setup QR code detection using a different approach
+    // Since BarcodeTracker is not available, we'll use the browser's BarcodeDetector API if available
+    if ('BarcodeDetector' in window) {
+      const barcodeDetector = new (window as any).BarcodeDetector({
+        formats: ['qr_code']
+      });
+      
+      // Get video stream for scanning (this would need permission)
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(stream => {
+          const videoElement = document.createElement('video');
+          videoElement.srcObject = stream;
+          videoElement.autoplay = true;
+          
+          // Periodically detect QR codes in the video stream
+          const scanInterval = setInterval(async () => {
+            try {
+              const barcodes = await barcodeDetector.detect(videoElement);
+              if (barcodes.length > 0) {
+                // Parse the QR code data
+                const data = barcodes[0].rawValue;
+                handleQRFound(data);
+              }
+            } catch (error) {
+              console.error("Barcode detection error:", error);
+            }
+          }, 1000);
+          
+          return () => {
+            clearInterval(scanInterval);
+            stream.getTracks().forEach(track => track.stop());
+          };
+        })
+        .catch(error => {
+          console.error("Camera access error:", error);
+          setErrorMessage("Could not access camera for QR scanning");
+        });
+    }
   }, [targetFile]);
   
   const handleQRFound = (data: string) => {
     console.log("QR Code found:", data);
     
     try {
-      // Parse the QR code data using our simple format
+      // Parse the QR code data using our format
       // Expected format: drivesight://drive/[id]/[moduleId]
       if (data.startsWith('drivesight://drive/')) {
         const parts = data.split('/');
@@ -78,30 +117,27 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
       <directionalLight position={[0, 5, 10]} intensity={1.0} />
       <ambientLight intensity={0.5} />
       
-      {/* Use BarcodeTracker for QR codes */}
-      <BarcodeTracker
-        onNewBarcode={(data) => handleQRFound(data)}
-        onBarcodeUpdate={(data) => console.log("Barcode updated:", data)}
-        onBarcodeVisible={() => console.log("Barcode visible")}
-        onBarcodeNotVisible={() => console.log("Barcode not visible")}
-      >
-        {scannedDrive && <DriveModel drive={scannedDrive} />}
-      </BarcodeTracker>
-      
-      {/* Keep the ImageTracker as a fallback */}
-      {targetFileLoaded && drives.map((drive) => (
+      {/* Use ImageTracker for detecting QR codes */}
+      {targetFileLoaded && (
         <ImageTracker
-          key={drive.id.toString()}
           targetImage={targetFile}
-          onNotVisible={() => console.log(`Target for drive ${drive.id} not visible`)}
-          onNewAnchor={(anchor) => console.log(`New anchor for drive ${drive.id}`)}
-          onVisible={() => console.log(`Target for drive ${drive.id} visible`)}
+          onNotVisible={() => console.log(`Target not visible`)}
+          onNewAnchor={(anchor) => console.log(`New anchor detected`)}
+          onVisible={() => console.log(`Target visible`)}
         >
-          <DriveModel drive={drive} />
+          {scannedDrive ? (
+            <DriveModel drive={scannedDrive} />
+          ) : (
+            <Billboard position={[0, 0, 0]}>
+              <Text color="white" fontSize={0.2}>
+                QR Code detected, processing...
+              </Text>
+            </Billboard>
+          )}
         </ImageTracker>
-      ))}
+      )}
       
-      {/* Add a fallback message if no QR code is scanned */}
+      {/* Fallback display if no QR code is detected */}
       {!scannedDrive && (
         <Billboard position={[0, 0, -3]}>
           <Text color="white" fontSize={0.2} anchorX="center" anchorY="middle">
