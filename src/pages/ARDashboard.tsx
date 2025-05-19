@@ -9,14 +9,9 @@ import { ArrowLeft, Camera, QrCode, RefreshCw, Shield, CheckCircle, AlertTriangl
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
-import { 
-  generateInitialRMDEData, 
-  updateRMDEData
-} from '@/utils/rmde/dataGenerator';
-import { 
-  getStatusBadgeClass,
-  getHealthColor, 
-} from '@/utils/rmde/uiUtils';
+import { generateInitialRMDEData } from '@/utils/rmde/dataGenerator';
+import { updateRMDEData } from '@/utils/rmde/dataUpdater';
+import { getStatusBadgeClass, getHealthColor } from '@/utils/rmde/uiUtils';
 import { RMDEDrive } from '@/utils/types/rmdeTypes';
 import SelfHealingSystem from '@/components/SelfHealingSystem';
 import DriveQRCodeGenerator from '@/components/DriveQRCodeGenerator';
@@ -120,6 +115,38 @@ function StandardView({ drives }) {
       ))}
     </div>
   );
+}
+
+// Properly define the ErrorBoundary component with the necessary props
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error("AR Error:", error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
 }
 
 const ARDashboard = () => {
@@ -299,28 +326,5 @@ const ARDashboard = () => {
     </div>
   );
 };
-
-// Simple error boundary component for AR issues
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error, info) {
-    console.error("AR Error:", error, info);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return this.props.fallback;
-    }
-    return this.props.children;
-  }
-}
 
 export default ARDashboard;
