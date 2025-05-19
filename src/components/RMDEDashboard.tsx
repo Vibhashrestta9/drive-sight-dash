@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Activity, AlertTriangle, ArrowRight, CheckCircle, ChevronsUpDown, Computer, Info, Laptop, RefreshCw, Servers, Settings } from 'lucide-react';
+import { Activity, AlertTriangle, ArrowRight, CheckCircle, ChevronsUpDown, Computer, Info, Laptop, RefreshCw, Server, Settings } from 'lucide-react';
 import { 
   RMDEDrive, 
   RMDEError, 
@@ -231,7 +231,7 @@ const RMDEDashboard = () => {
                         <span>{status.temperature}°C</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Servers className="h-4 w-4 text-gray-500" />
+                        <Server className="h-4 w-4 text-gray-500" />
                         <span>Humidity:</span>
                         <span>{status.humidity}%</span>
                       </div>

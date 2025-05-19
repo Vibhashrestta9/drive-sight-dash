@@ -10,8 +10,43 @@ interface ARSceneProps {
 }
 
 const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
-  // This would be your QR code target image
-  const targetFile = "qr-target.zpt";
+  // Use state to track if target file has been loaded
+  const [targetFileLoaded, setTargetFileLoaded] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
+  // This would be your QR code target file
+  const targetFile = "/qr-target.zpt";
+  
+  useEffect(() => {
+    // Check if the target file exists
+    fetch(targetFile)
+      .then(response => {
+        if (response.ok) {
+          setTargetFileLoaded(true);
+        } else {
+          console.error("Failed to load target file:", response.statusText);
+          setErrorMessage("QR target file could not be loaded");
+        }
+      })
+      .catch(error => {
+        console.error("Error loading target file:", error);
+        setErrorMessage("Error loading QR target file");
+      });
+  }, [targetFile]);
+  
+  if (errorMessage) {
+    // Return a fallback if there's an error
+    return (
+      <>
+        <ambientLight intensity={0.5} />
+        <Billboard position={[0, 0, -5]}>
+          <Text color="red" fontSize={0.5}>
+            {errorMessage}
+          </Text>
+        </Billboard>
+      </>
+    );
+  }
   
   return (
     <>
@@ -19,8 +54,8 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
       <directionalLight position={[0, 5, 10]} intensity={1.0} />
       <ambientLight intensity={0.5} />
       
-      {/* Multiple trackers for each drive QR code */}
-      {drives.map((drive) => (
+      {/* Only render trackers if target file is loaded */}
+      {targetFileLoaded && drives.map((drive) => (
         <ImageTracker
           key={drive.id.toString()}
           targetImage={targetFile}

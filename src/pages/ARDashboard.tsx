@@ -1,8 +1,5 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Text, Box, Stats } from '@react-three/drei';
-import { ZapparCamera, ImageTracker, ZapparCanvas } from '@zappar/zappar-react-three-fiber';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,16 +11,47 @@ import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 import { 
   generateInitialRMDEData, 
-  updateRMDEData,
+  updateRMDEData
+} from '@/utils/rmde/dataGenerator';
+import { 
   getStatusBadgeClass,
   getHealthColor, 
-  RMDEDrive 
-} from '@/utils/rmdeUtils';
+} from '@/utils/rmde/uiUtils';
+import { RMDEDrive } from '@/utils/types/rmdeTypes';
 import SelfHealingSystem from '@/components/SelfHealingSystem';
 import DriveQRCodeGenerator from '@/components/DriveQRCodeGenerator';
 
-// This is for AR mode
-const ARScene = React.lazy(() => import('@/components/ar/ARScene'));
+// Use dynamic import to avoid AR errors on initial load
+const ARScene = React.lazy(() => 
+  import('@/components/ar/ARScene')
+    .catch(err => {
+      console.error("Failed to load AR Scene:", err);
+      // Return a fallback component
+      return {
+        default: () => (
+          <div className="flex h-full w-full items-center justify-center">
+            <p>AR functionality could not be loaded. Please check your device compatibility.</p>
+          </div>
+        )
+      };
+    })
+);
+
+// Simple wrapper to handle AR canvas
+const ARCanvasWrapper = ({ children }: { children: React.ReactNode }) => {
+  try {
+    // Dynamically import ZapparCanvas only when needed
+    const { ZapparCanvas } = require('@zappar/zappar-react-three-fiber');
+    return <ZapparCanvas>{children}</ZapparCanvas>;
+  } catch (error) {
+    console.error("Failed to initialize ZapparCanvas:", error);
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <p>AR functionality could not be initialized.</p>
+      </div>
+    );
+  }
+};
 
 // For fallback non-AR mode
 function StandardView({ drives }) {
@@ -95,44 +123,55 @@ function StandardView({ drives }) {
 }
 
 const ARDashboard = () => {
-  const [rmdeData, setRmdeData] = useState(generateInitialRMDEData());
+  const [rmdeData, setRmdeData] = useState<RMDEDrive[]>([]);
   const [arMode, setArMode] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [arError, setArError] = useState<string | null>(null);
   const { toast } = useToast();
   const [selfHealingEnabled, setSelfHealingEnabled] = useState(false);
   const [showQrGenerator, setShowQrGenerator] = useState(false);
   
   useEffect(() => {
-    // This ensures we have consistent data across components
-    const initialData = generateInitialRMDEData();
-    setRmdeData(initialData);
-    
-    // Simulated data updates
-    const interval = setInterval(() => {
-      setRmdeData(prevData => updateRMDEData(prevData));
-    }, 5000);
-    
-    return () => clearInterval(interval);
+    try {
+      // This ensures we have consistent data across components
+      const initialData = generateInitialRMDEData();
+      setRmdeData(initialData);
+      
+      // Simulated data updates
+      const interval = setInterval(() => {
+        setRmdeData(prevData => updateRMDEData(prevData));
+      }, 5000);
+      
+      return () => clearInterval(interval);
+    } catch (error) {
+      console.error("Error initializing data:", error);
+      toast({
+        title: "Data Error",
+        description: "Failed to initialize dashboard data",
+        variant: "destructive",
+      });
+    }
   }, []);
   
   const handleEnableAR = () => {
-    if (!arMode) {
-      // Check if device supports WebXR
-      if ('xr' in navigator) {
+    try {
+      if (!arMode) {
         setArMode(true);
         toast({
           title: "AR Mode Enabled",
           description: "Point your camera at a QR code to visualize drive data",
         });
       } else {
-        toast({
-          title: "AR Not Supported",
-          description: "Your device does not support AR features",
-          variant: "destructive",
-        });
+        setArMode(false);
       }
-    } else {
-      setArMode(false);
+    } catch (error) {
+      console.error("AR mode error:", error);
+      setArError("Failed to initialize AR mode");
+      toast({
+        title: "AR Error",
+        description: "Could not initialize AR mode",
+        variant: "destructive",
+      });
     }
   };
   
@@ -226,9 +265,18 @@ const ARDashboard = () => {
           {arMode ? (
             <div className="h-[600px] rounded-lg overflow-hidden border border-gray-200">
               <Suspense fallback={<div className="flex h-full w-full items-center justify-center">Loading AR capabilities...</div>}>
-                <ZapparCanvas>
-                  <ARScene drives={rmdeData} />
-                </ZapparCanvas>
+                {arError ? (
+                  <div className="flex h-full w-full items-center justify-center bg-red-50 text-red-500">
+                    <AlertTriangle className="h-8 w-8 mr-2" />
+                    <p>{arError}</p>
+                  </div>
+                ) : (
+                  <ErrorBoundary fallback={<p className="p-4">Something went wrong with AR initialization</p>}>
+                    <ARCanvasWrapper>
+                      <ARScene drives={rmdeData} />
+                    </ARCanvasWrapper>
+                  </ErrorBoundary>
+                )}
               </Suspense>
             </div>
           ) : (
@@ -251,5 +299,28 @@ const ARDashboard = () => {
     </div>
   );
 };
+
+// Simple error boundary component for AR issues
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, info) {
+    console.error("AR Error:", error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
+}
 
 export default ARDashboard;
