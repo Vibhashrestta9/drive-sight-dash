@@ -1,6 +1,6 @@
 
 import React, { Suspense } from 'react';
-import { AlertTriangle, ScanLine } from 'lucide-react';
+import { AlertTriangle, ScanLine, QrCode } from 'lucide-react';
 import { RMDEDrive } from '@/utils/types/rmdeTypes';
 
 // Lazily load the AR Scene component
@@ -93,6 +93,10 @@ const ARViewWrapper: React.FC<ARViewWrapperProps> = ({ drives, arMode, arError }
         <p className="text-xs opacity-80">
           Hold your device steady and point at the QR code to view drive data in AR
         </p>
+        <div className="mt-2 text-xs opacity-90 flex items-center">
+          <QrCode className="h-3 w-3 mr-1 text-green-400" />
+          <span>Remember: These QR codes are <span className="text-green-400">ONLY for the AR Dashboard</span>, not web browsers</span>
+        </div>
       </div>
       
       <Suspense fallback={<div className="flex h-full w-full items-center justify-center">Loading AR capabilities...</div>}>
@@ -102,7 +106,15 @@ const ARViewWrapper: React.FC<ARViewWrapperProps> = ({ drives, arMode, arError }
             <p>{arError}</p>
           </div>
         ) : (
-          <ErrorBoundary fallback={<p className="p-4">Something went wrong with AR initialization</p>}>
+          <ErrorBoundary fallback={
+            <div className="flex flex-col h-full w-full items-center justify-center p-4">
+              <AlertTriangle className="h-10 w-10 text-amber-500 mb-2" />
+              <p className="text-center">Something went wrong with AR initialization</p>
+              <p className="text-sm text-gray-500 mt-2">
+                Try refreshing the page or check if your device supports AR features
+              </p>
+            </div>
+          }>
             <ARCanvasWrapper>
               <ARScene drives={drives} />
             </ARCanvasWrapper>

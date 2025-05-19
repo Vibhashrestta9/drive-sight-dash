@@ -6,6 +6,7 @@ import { RMDEDrive } from '@/utils/types/rmdeTypes';
 import DriveARModel from './DriveARModel';
 import QRCodeScanner from './QRCodeScanner';
 import ARFallbackView from './ARFallbackView';
+import { useToast } from '@/hooks/use-toast';
 
 interface ARSceneProps {
   drives: RMDEDrive[];
@@ -17,6 +18,8 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [scannedDriveId, setScannedDriveId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [lastScannedData, setLastScannedData] = useState<string | null>(null);
+  const { toast } = useToast();
   
   // This would be your QR code target file
   const targetFile = "/qr-target.zpt";
@@ -40,7 +43,22 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
   
   const handleQRFound = (data: string) => {
     console.log("QR Code found:", data);
+    
+    // Prevent processing the same QR code repeatedly
+    if (data === lastScannedData && isProcessing) {
+      console.log("Ignoring duplicate QR scan");
+      return;
+    }
+    
+    setLastScannedData(data);
     setIsProcessing(true);
+    
+    // Show toast to indicate scanning is happening
+    toast({
+      title: "QR Code Detected",
+      description: "Processing QR code data...",
+      duration: 2000,
+    });
     
     try {
       // Parse the QR code data using our format
@@ -49,10 +67,35 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
         const parts = data.split('/');
         if (parts.length >= 4) {
           const driveId = parts[3];
-          setScannedDriveId(driveId);
-          console.log("Found drive with ID:", driveId);
+          const matchingDrive = drives.find(drive => drive.id.toString() === driveId);
+          
+          if (matchingDrive) {
+            setScannedDriveId(driveId);
+            console.log("Found drive with ID:", driveId);
+            toast({
+              title: "Drive Found",
+              description: `Displaying data for ${matchingDrive.name}`,
+              duration: 3000,
+            });
+          } else {
+            setErrorMessage(`No drive found with ID: ${driveId}`);
+            toast({
+              title: "Drive Not Found",
+              description: `No drive with ID: ${driveId}`,
+              variant: "destructive",
+              duration: 3000,
+            });
+            setTimeout(() => setErrorMessage(null), 3000);
+          }
         } else {
           setErrorMessage("Invalid QR code format");
+          toast({
+            title: "Invalid QR Code",
+            description: "QR code format is not valid",
+            variant: "destructive",
+            duration: 3000,
+          });
+          setTimeout(() => setErrorMessage(null), 3000);
         }
       } else {
         // Handle legacy or incorrect format
@@ -64,21 +107,47 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
           if (matchingDrive) {
             setScannedDriveId(possibleDriveId);
             console.log("Found drive with direct ID:", possibleDriveId);
+            toast({
+              title: "Drive Found",
+              description: `Displaying data for ${matchingDrive.name}`,
+              duration: 3000,
+            });
           } else {
             setErrorMessage("QR code not recognized as a valid drive");
+            toast({
+              title: "Invalid QR Code",
+              description: "QR code not recognized as a valid drive",
+              variant: "destructive",
+              duration: 3000,
+            });
             setTimeout(() => setErrorMessage(null), 3000);
           }
         } catch (e) {
           setErrorMessage("Could not parse QR code data");
+          toast({
+            title: "Error",
+            description: "Could not parse QR code data",
+            variant: "destructive",
+            duration: 3000,
+          });
           setTimeout(() => setErrorMessage(null), 3000);
         }
       }
     } catch (error) {
       console.error("Error parsing QR data:", error);
       setErrorMessage("Error parsing QR code data");
+      toast({
+        title: "Error",
+        description: "Error parsing QR code data",
+        variant: "destructive",
+        duration: 3000,
+      });
       setTimeout(() => setErrorMessage(null), 3000);
     } finally {
-      setIsProcessing(false);
+      // Reset processing after a delay to prevent immediate rescanning
+      setTimeout(() => {
+        setIsProcessing(false);
+      }, 2000);
     }
   };
   
