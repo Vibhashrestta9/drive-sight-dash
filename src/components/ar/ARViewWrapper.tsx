@@ -1,6 +1,6 @@
 
 import React, { Suspense } from 'react';
-import { AlertTriangle, ScanLine, QrCode, Info } from 'lucide-react';
+import { AlertTriangle, Info } from 'lucide-react';
 import { RMDEDrive } from '@/utils/types/rmdeTypes';
 
 // Lazily load the AR Scene component
@@ -87,16 +87,16 @@ const ARViewWrapper: React.FC<ARViewWrapperProps> = ({ drives, arMode, arError }
       {/* AR instructions overlay */}
       <div className="absolute z-10 top-4 left-4 right-4 bg-black/70 text-white p-3 rounded-lg">
         <div className="flex items-center mb-1">
-          <ScanLine className="h-4 w-4 mr-2" />
-          <span className="font-semibold">Point camera at QR code</span>
+          <Info className="h-4 w-4 mr-2" />
+          <span className="font-semibold">AR Drive Visualization</span>
         </div>
         <p className="text-xs opacity-80">
-          Hold your device steady and point at the QR code to view drive data in AR
+          Select a drive from the top panel to view its data in augmented reality
         </p>
         <div className="mt-2 text-xs opacity-90 flex flex-col">
-          <div className="flex items-center">
-            <QrCode className="h-3 w-3 mr-1 text-green-400" />
-            <span>These QR codes are <span className="text-green-400">ONLY for the AR Dashboard</span>, not web browsers</span>
+          <div className="flex items-center mt-1">
+            <Info className="h-3 w-3 mr-1 text-blue-400" />
+            <span>Use your device's camera to place the 3D model in your environment</span>
           </div>
           <div className="flex items-center mt-1">
             <Info className="h-3 w-3 mr-1 text-blue-400" />
