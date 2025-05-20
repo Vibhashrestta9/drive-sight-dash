@@ -1,14 +1,15 @@
 
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { RMDEDrive } from '@/utils/types/rmdeTypes';
 
-interface QRCodeProcessorProps {
+interface UseQRCodeProcessorProps {
   drives: RMDEDrive[];
   onDriveFound: (driveId: string) => void;
 }
 
-const QRCodeProcessor: React.FC<QRCodeProcessorProps> = ({ drives, onDriveFound }) => {
+// Renamed to useQRCodeProcessor to follow React hook naming conventions
+export function useQRCodeProcessor({ drives, onDriveFound }: UseQRCodeProcessorProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [lastScannedData, setLastScannedData] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -129,6 +130,4 @@ const QRCodeProcessor: React.FC<QRCodeProcessorProps> = ({ drives, onDriveFound 
     errorMessage, 
     isProcessing 
   };
-};
-
-export default QRCodeProcessor;
+}

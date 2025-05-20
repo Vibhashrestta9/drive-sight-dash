@@ -5,7 +5,7 @@ import { RMDEDrive } from '@/utils/types/rmdeTypes';
 import QRCodeScanner from './QRCodeScanner';
 import ARFallbackView from './ARFallbackView';
 import ScannedDriveDisplay from './ScannedDriveDisplay';
-import QRCodeProcessor from './QRCodeProcessor';
+import { useQRCodeProcessor } from './QRCodeProcessor';
 import { useZapparTarget } from '@/hooks/useZapparTarget';
 import { useMaintenanceLog } from '@/hooks/useMaintenanceLog';
 
@@ -24,8 +24,8 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
   // Maintenance log functionality
   const { logServiceActivity } = useMaintenanceLog(drives);
   
-  // QR code processing logic
-  const { handleQRFound, isProcessing } = QRCodeProcessor({ 
+  // QR code processing logic - now using the custom hook properly
+  const { handleQRFound, isProcessing } = useQRCodeProcessor({ 
     drives, 
     onDriveFound: setScannedDriveId 
   });
