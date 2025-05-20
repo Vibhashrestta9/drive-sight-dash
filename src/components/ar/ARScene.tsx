@@ -1,11 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { ZapparCamera } from '@zappar/zappar-react-three-fiber';
 import { Billboard, Text } from '@react-three/drei';
 import { RMDEDrive } from '@/utils/types/rmdeTypes';
 import ARFallbackView from './ARFallbackView';
 import ScannedDriveDisplay from './ScannedDriveDisplay';
-import { useZapparTarget } from '@/hooks/useZapparTarget';
 import { useMaintenanceLog } from '@/hooks/useMaintenanceLog';
 
 interface ARSceneProps {
@@ -18,7 +16,6 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
   
   // This would be your QR code target file
   const targetFile = "/qr-target.zpt";
-  const { targetFileLoaded, errorMessage } = useZapparTarget(targetFile);
   
   // Maintenance log functionality
   const { logServiceActivity } = useMaintenanceLog(drives);
@@ -41,13 +38,14 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
     ? drives.find(drive => drive.id.toString() === selectedDriveId) 
     : null;
   
-  if (errorMessage) {
-    return <ARFallbackView errorMessage={errorMessage} />;
-  }
-  
   return (
     <>
-      <ZapparCamera makeDefault />
+      {/* Simulated camera background */}
+      <mesh position={[0, 0, -10]}>
+        <planeGeometry args={[30, 30]} />
+        <meshBasicMaterial color="#1a1a2e" />
+      </mesh>
+      
       <directionalLight position={[0, 5, 10]} intensity={1.0} />
       <ambientLight intensity={0.5} />
       
@@ -85,7 +83,7 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
       </group>
       
       {/* Display selected drive 3D model */}
-      {targetFileLoaded && (
+      {selectedDrive && (
         <ScannedDriveDisplay 
           targetFile={targetFile}
           scannedDrive={selectedDrive}
