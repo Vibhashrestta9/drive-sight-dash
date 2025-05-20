@@ -1,6 +1,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Box, Billboard, Html, useFrame } from '@react-three/drei';
+import { Box, Billboard, Html } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
 import Text from './Text';
 import { RMDEDrive } from '@/utils/types/rmdeTypes';
 import * as THREE from 'three';
