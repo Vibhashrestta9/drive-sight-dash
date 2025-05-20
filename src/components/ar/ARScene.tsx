@@ -19,6 +19,7 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
   const [scannedDriveId, setScannedDriveId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [lastScannedData, setLastScannedData] = useState<string | null>(null);
+  const [maintenanceLog, setMaintenanceLog] = useState<{driveId: string, timestamp: Date}[]>([]);
   const { toast } = useToast();
   
   // This would be your QR code target file
@@ -74,7 +75,7 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
             console.log("Found drive with ID:", driveId);
             toast({
               title: "Drive Found",
-              description: `Displaying data for ${matchingDrive.name}`,
+              description: `Displaying ${matchingDrive.name}`,
               duration: 3000,
             });
           } else {
@@ -150,6 +151,23 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
       }, 2000);
     }
   };
+
+  const handleServiceLog = () => {
+    if (scannedDriveId) {
+      const newLog = {
+        driveId: scannedDriveId,
+        timestamp: new Date()
+      };
+      setMaintenanceLog(prev => [...prev, newLog]);
+      
+      const drive = drives.find(d => d.id.toString() === scannedDriveId);
+      toast({
+        title: "Maintenance Logged", 
+        description: `Service logged for ${drive?.name} at ${newLog.timestamp.toLocaleTimeString()}`,
+        duration: 3000
+      });
+    }
+  };
   
   // Find the drive that matches the scanned QR code
   const scannedDrive = scannedDriveId 
@@ -178,7 +196,10 @@ const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
           onVisible={() => console.log(`Target visible`)}
         >
           {scannedDrive ? (
-            <DriveARModel drive={scannedDrive} />
+            <DriveARModel 
+              drive={scannedDrive} 
+              onServiceLog={handleServiceLog}
+            />
           ) : (
             <Billboard position={[0, 0, 0]}>
               <Text color="white" fontSize={0.2}>
