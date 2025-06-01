@@ -61,24 +61,24 @@ const DriveMetricsCards = () => {
   });
 
   useEffect(() => {
-    // SIGNIFICANTLY INCREASED UPDATE FREQUENCY FROM 20000ms to 60000ms (60 seconds)
+    // DRAMATICALLY INCREASED UPDATE FREQUENCY FROM 60000ms to 180000ms (3 minutes)
     const interval = setInterval(() => {
       setMetrics(prev => {
         const randomChange = (min: number, max: number) => {
           return (Math.random() * (max - min) + min).toFixed(1);
         };
 
-        const newActiveDrivers = Math.floor(Math.random() * 2) - 1 + parseInt(prev.activeDrivers); // Reduced from 3 to 2
+        const newActiveDrivers = Math.floor(Math.random() * 1) + parseInt(prev.activeDrivers); // Reduced from 2 to 1 (minimal change)
         
         return {
           activeDrivers: Math.max(10, Math.min(20, newActiveDrivers)).toString(),
-          averageSpeed: (parseFloat(prev.averageSpeed) + parseFloat(randomChange(-0.3, 0.3))).toFixed(0), // Reduced from -1,1 to -0.3,0.3
-          driveTime: (parseFloat(prev.driveTime) + parseFloat(randomChange(0, 0.1))).toFixed(0), // Reduced from 0.3 to 0.1
-          totalDistance: (parseFloat(prev.totalDistance.replace(',', '')) + parseFloat(randomChange(0.1, 0.5))).toLocaleString(), // Reduced from 0.5,2 to 0.1,0.5
-          fuelEfficiency: (parseFloat(prev.fuelEfficiency) + parseFloat(randomChange(-0.05, 0.05))).toFixed(1) // Reduced from -0.1,0.1 to -0.05,0.05
+          averageSpeed: (parseFloat(prev.averageSpeed) + parseFloat(randomChange(-0.1, 0.1))).toFixed(0), // Reduced from -0.3,0.3 to -0.1,0.1
+          driveTime: (parseFloat(prev.driveTime) + parseFloat(randomChange(0, 0.03))).toFixed(0), // Reduced from 0.1 to 0.03
+          totalDistance: (parseFloat(prev.totalDistance.replace(',', '')) + parseFloat(randomChange(0.03, 0.1))).toLocaleString(), // Reduced from 0.1,0.5 to 0.03,0.1
+          fuelEfficiency: (parseFloat(prev.fuelEfficiency) + parseFloat(randomChange(-0.02, 0.02))).toFixed(1) // Reduced from -0.05,0.05 to -0.02,0.02
         };
       });
-    }, 60000); // Changed from 20000 to 60000 milliseconds (1 minute)
+    }, 180000); // Changed from 60000 to 180000 milliseconds (3 minutes)
 
     return () => clearInterval(interval);
   }, []);

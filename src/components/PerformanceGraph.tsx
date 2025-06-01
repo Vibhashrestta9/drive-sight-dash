@@ -126,8 +126,14 @@ const PerformanceGraph = () => {
                 margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis dataKey="time" />
-                <YAxis domain={[0, 'auto']} />
+                <XAxis 
+                  dataKey="time" 
+                  label={{ value: 'Time', position: 'insideBottom', offset: -5 }}
+                />
+                <YAxis 
+                  domain={[0, 'auto']} 
+                  label={{ value: 'Speed (mph)', angle: -90, position: 'insideLeft' }}
+                />
                 <Tooltip
                   contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
                   formatter={(value) => [`${value} mph`, 'Speed']}
@@ -151,8 +157,14 @@ const PerformanceGraph = () => {
                 margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis dataKey="time" />
-                <YAxis domain={[0, 'auto']} />
+                <XAxis 
+                  dataKey="time" 
+                  label={{ value: 'Time', position: 'insideBottom', offset: -5 }}
+                />
+                <YAxis 
+                  domain={[0, 'auto']} 
+                  label={{ value: 'Distance (miles)', angle: -90, position: 'insideLeft' }}
+                />
                 <Tooltip
                   contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
                   formatter={(value) => [`${value} miles`, 'Distance']}
@@ -176,8 +188,14 @@ const PerformanceGraph = () => {
                 margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis dataKey="time" />
-                <YAxis domain={[0, 40]} />
+                <XAxis 
+                  dataKey="time" 
+                  label={{ value: 'Time', position: 'insideBottom', offset: -5 }}
+                />
+                <YAxis 
+                  domain={[0, 40]} 
+                  label={{ value: 'Fuel Economy (mpg)', angle: -90, position: 'insideLeft' }}
+                />
                 <Tooltip
                   contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
                   formatter={(value) => [`${value} mpg`, 'Fuel Economy']}

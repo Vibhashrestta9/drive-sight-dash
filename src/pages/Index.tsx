@@ -28,14 +28,14 @@ const Index = () => {
     const initialData = generateInitialRMDEData();
     setRmdeData(initialData);
     
-    // Set up interval for real-time updates - SIGNIFICANTLY INCREASED FROM 15000ms to 45000ms (45 seconds)
+    // Set up interval for real-time updates - DRAMATICALLY INCREASED FROM 45000ms to 120000ms (2 minutes)
     const interval = setInterval(() => {
       setRmdeData(prev => {
         const updated = updateRMDEData(prev);
         // Apply PLC simulation if enabled
         return isSimulating ? updateSimulatedDrives(updated) : updated;
       });
-    }, 45000); // Changed from 15000 to 45000 milliseconds
+    }, 120000); // Changed from 45000 to 120000 milliseconds (2 minutes)
     
     return () => clearInterval(interval);
   }, [isSimulating, updateSimulatedDrives]);
@@ -137,12 +137,12 @@ const Index = () => {
         </div>
         
         {/* Drive Health Index Section */}
-        <div className="mb-6 bg-gradient-to-r from-green-100 to-emerald-100 rounded-xl p-1">
+        <div className="mb-6 bg-gradient-to-r from-emerald-100 via-teal-100 to-cyan-100 rounded-xl p-1">
           <DriveHealthIndex drives={rmdeData} />
         </div>
 
         {/* Behavioral Fingerprint Section */}
-        <div className="mb-6 bg-gradient-to-r from-indigo-100 to-blue-100 rounded-xl p-1">
+        <div className="mb-6 bg-gradient-to-r from-violet-100 via-purple-100 to-indigo-100 rounded-xl p-1">
           <BehavioralFingerprint drives={rmdeData} />
         </div>
         
