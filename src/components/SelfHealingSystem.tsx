@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,11 +16,13 @@ interface SelfHealingSystemProps {
 const SelfHealingSystem = ({ drives, onHeal }: SelfHealingSystemProps) => {
   const [isHealing, setIsHealing] = useState(false);
   
+  // Significantly reduce the number of critical errors shown - limit to maximum 2 errors
   const criticalErrors = drives.reduce((acc, drive) => {
     drive.errors.filter(error => error.severity === 'critical' && !error.resolved)
       .forEach(error => acc.push({ ...error, driveId: drive.id }));
     return acc;
-  }, [] as ({ driveId: number } & RMDEDrive['errors'][0])[]);
+  }, [] as ({ driveId: number } & RMDEDrive['errors'][0])[])
+  .slice(0, 2); // Limit to only 2 critical errors maximum
   
   const handleHeal = (driveId: string, errorId: string) => {
     setIsHealing(true);
