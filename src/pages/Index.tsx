@@ -28,14 +28,14 @@ const Index = () => {
     const initialData = generateInitialRMDEData();
     setRmdeData(initialData);
     
-    // Set up interval for real-time updates
+    // Set up interval for real-time updates - REDUCED FROM 5000ms to 15000ms (15 seconds)
     const interval = setInterval(() => {
       setRmdeData(prev => {
         const updated = updateRMDEData(prev);
         // Apply PLC simulation if enabled
         return isSimulating ? updateSimulatedDrives(updated) : updated;
       });
-    }, 5000);
+    }, 15000); // Changed from 5000 to 15000 milliseconds
     
     return () => clearInterval(interval);
   }, [isSimulating, updateSimulatedDrives]);
@@ -58,18 +58,20 @@ const Index = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       <div className="container mx-auto px-4 py-8">
-        <header className="mb-8 flex justify-between items-center">
+        <header className="mb-8 flex justify-between items-center bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-purple-200">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">DriveSight Dashboard</h1>
-            <p className="text-gray-600">Real-time monitoring and analytics for your fleet</p>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              DriveSight Dashboard
+            </h1>
+            <p className="text-gray-700 font-medium">Real-time monitoring and analytics for your fleet</p>
           </div>
           <div className="flex gap-3">
             <RoleAwareControl requiresWrite>
               <Link 
                 to="/sim-configuration" 
-                className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 shadow-lg transform hover:scale-105"
               >
                 <Network className="h-5 w-5" />
                 SIM Configuration
@@ -78,7 +80,7 @@ const Index = () => {
             <RoleAwareControl requiresAdmin>
               <Link 
                 to="/cyber-security" 
-                className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+                className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-3 rounded-xl hover:from-red-600 hover:to-pink-600 transition-all duration-300 shadow-lg transform hover:scale-105"
               >
                 <Shield className="h-5 w-5" />
                 Cybersecurity
@@ -86,7 +88,7 @@ const Index = () => {
             </RoleAwareControl>
             <Link 
               to="/ar-dashboard" 
-              className="flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
+              className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-6 py-3 rounded-xl hover:from-purple-600 hover:to-indigo-600 transition-all duration-300 shadow-lg transform hover:scale-105"
             >
               <Camera className="h-5 w-5" />
               AR Dashboard
@@ -95,13 +97,19 @@ const Index = () => {
         </header>
 
         {/* Role-Based Access Control */}
-        <UserRoleSelector />
+        <div className="mb-6">
+          <UserRoleSelector />
+        </div>
         
         {/* PLC Simulation Panel */}
-        <PLCSimulationPanel />
+        <div className="mb-6">
+          <PLCSimulationPanel />
+        </div>
 
         {/* Metrics Summary Cards */}
-        <DriveMetricsCards />
+        <div className="mb-6">
+          <DriveMetricsCards />
+        </div>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
