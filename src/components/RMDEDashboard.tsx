@@ -42,10 +42,10 @@ const RMDEDashboard = () => {
     const initialSystemStatuses = generateRMDESystemStatus();
     setSystemStatuses(initialSystemStatuses);
     
-    // Set up interval for real-time updates
+    // Set up interval for real-time updates - SIGNIFICANTLY INCREASED FROM 5000ms to 30000ms (30 seconds)
     const interval = setInterval(() => {
       setDrives(prev => updateRMDEData(prev));
-    }, 5000);
+    }, 30000); // Changed from 5000 to 30000 milliseconds
     
     return () => clearInterval(interval);
   }, []);
@@ -73,35 +73,35 @@ const RMDEDashboard = () => {
   }, [drives, sortConfig]);
   
   return (
-    <Card>
-      <CardHeader>
+    <Card className="bg-gradient-to-br from-slate-50 to-gray-100 border-purple-200">
+      <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>RMDE System Overview</CardTitle>
             <CardDescription>Real-time status and analytics for all connected drives and modules</CardDescription>
           </div>
-          <Button variant="outline">
+          <Button variant="outline" className="bg-gradient-to-r from-blue-100 to-purple-100 border-purple-300">
             <Settings className="h-4 w-4 mr-2" />
             Configuration
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="bg-gradient-to-br from-white to-blue-50">
         <Tabs defaultValue="drives" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="drives" onClick={() => setActiveTab('drives')}>Drives</TabsTrigger>
-            <TabsTrigger value="modules" onClick={() => setActiveTab('modules')}>Modules</TabsTrigger>
-            <TabsTrigger value="system" onClick={() => setActiveTab('system')}>System Status</TabsTrigger>
+          <TabsList className="bg-gradient-to-r from-purple-100 to-blue-100">
+            <TabsTrigger value="drives" onClick={() => setActiveTab('drives')} className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">Drives</TabsTrigger>
+            <TabsTrigger value="modules" onClick={() => setActiveTab('modules')} className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">Modules</TabsTrigger>
+            <TabsTrigger value="system" onClick={() => setActiveTab('system')} className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">System Status</TabsTrigger>
           </TabsList>
           
           {/* Drives Tab */}
           <TabsContent value="drives" className="space-y-4">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground bg-gradient-to-r from-green-100 to-blue-100 p-3 rounded-lg">
               Total Drives: {drives.length} | Online: {drives.filter(d => d.status === 'online').length} | 
               Warnings: {drives.filter(d => d.status === 'warning').length} | Errors: {drives.filter(d => d.status === 'error').length}
             </div>
             <Separator />
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto bg-gradient-to-br from-white to-blue-50 rounded-lg p-4">
               <Table>
                 <TableCaption>A list of your recent drives.</TableCaption>
                 <TableHeader>
@@ -158,12 +158,12 @@ const RMDEDashboard = () => {
           
           {/* Modules Tab */}
           <TabsContent value="modules">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground bg-gradient-to-r from-yellow-100 to-orange-100 p-3 rounded-lg">
               Total Modules: {modules.length} | Online: {modules.filter(m => m.status === 'online').length} | 
               Warnings: {modules.filter(m => m.status === 'warning').length} | Errors: {modules.filter(m => m.status === 'error').length}
             </div>
             <Separator />
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto bg-gradient-to-br from-white to-yellow-50 rounded-lg p-4">
               <Table>
                 <TableCaption>List of connected NETA-21 Modules</TableCaption>
                 <TableHeader>
@@ -203,13 +203,13 @@ const RMDEDashboard = () => {
           
           {/* System Status Tab */}
           <TabsContent value="system">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground bg-gradient-to-r from-emerald-100 to-teal-100 p-3 rounded-lg">
               Overall System Health and Status
             </div>
             <Separator />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-gradient-to-br from-white to-emerald-50 rounded-lg p-4">
               {systemStatuses.map(status => (
-                <Card key={status.id}>
+                <Card key={status.id} className="bg-gradient-to-br from-white to-teal-50 border-teal-200">
                   <CardHeader>
                     <CardTitle>System: {status.id}</CardTitle>
                     <CardDescription>
@@ -238,7 +238,7 @@ const RMDEDashboard = () => {
                     </div>
                   </CardContent>
                   <CardFooter className="justify-between">
-                    <Button variant="secondary">
+                    <Button variant="secondary" className="bg-gradient-to-r from-teal-100 to-blue-100">
                       <RefreshCw className="h-4 w-4 mr-2" />
                       Refresh
                     </Button>
@@ -255,7 +255,7 @@ const RMDEDashboard = () => {
           </TabsContent>
         </Tabs>
       </CardContent>
-      <CardFooter className="flex items-center justify-between">
+      <CardFooter className="flex items-center justify-between bg-gradient-to-r from-green-50 to-blue-50">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CheckCircle className="h-4 w-4 text-green-500" />
           <span>All systems operational</span>

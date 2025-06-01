@@ -61,24 +61,24 @@ const DriveMetricsCards = () => {
   });
 
   useEffect(() => {
-    // REDUCED UPDATE FREQUENCY FROM 5000ms to 20000ms (20 seconds)
+    // SIGNIFICANTLY INCREASED UPDATE FREQUENCY FROM 20000ms to 60000ms (60 seconds)
     const interval = setInterval(() => {
       setMetrics(prev => {
         const randomChange = (min: number, max: number) => {
           return (Math.random() * (max - min) + min).toFixed(1);
         };
 
-        const newActiveDrivers = Math.floor(Math.random() * 3) - 1 + parseInt(prev.activeDrivers);
+        const newActiveDrivers = Math.floor(Math.random() * 2) - 1 + parseInt(prev.activeDrivers); // Reduced from 3 to 2
         
         return {
           activeDrivers: Math.max(10, Math.min(20, newActiveDrivers)).toString(),
-          averageSpeed: (parseFloat(prev.averageSpeed) + parseFloat(randomChange(-1, 1))).toFixed(0),
-          driveTime: (parseFloat(prev.driveTime) + parseFloat(randomChange(0, 0.3))).toFixed(0),
-          totalDistance: (parseFloat(prev.totalDistance.replace(',', '')) + parseFloat(randomChange(0.5, 2))).toLocaleString(),
-          fuelEfficiency: (parseFloat(prev.fuelEfficiency) + parseFloat(randomChange(-0.1, 0.1))).toFixed(1)
+          averageSpeed: (parseFloat(prev.averageSpeed) + parseFloat(randomChange(-0.3, 0.3))).toFixed(0), // Reduced from -1,1 to -0.3,0.3
+          driveTime: (parseFloat(prev.driveTime) + parseFloat(randomChange(0, 0.1))).toFixed(0), // Reduced from 0.3 to 0.1
+          totalDistance: (parseFloat(prev.totalDistance.replace(',', '')) + parseFloat(randomChange(0.1, 0.5))).toLocaleString(), // Reduced from 0.5,2 to 0.1,0.5
+          fuelEfficiency: (parseFloat(prev.fuelEfficiency) + parseFloat(randomChange(-0.05, 0.05))).toFixed(1) // Reduced from -0.1,0.1 to -0.05,0.05
         };
       });
-    }, 20000); // Changed from 5000 to 20000 milliseconds
+    }, 60000); // Changed from 20000 to 60000 milliseconds (1 minute)
 
     return () => clearInterval(interval);
   }, []);

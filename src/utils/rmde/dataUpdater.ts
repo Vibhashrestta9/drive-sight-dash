@@ -2,35 +2,35 @@
 import { RMDEDrive } from '../types/rmdeTypes';
 
 /**
- * Updates RMDE data with simulated changes - REDUCED FLUCTUATION RATES
+ * Updates RMDE data with simulated changes - SIGNIFICANTLY REDUCED FLUCTUATION RATES
  */
 export const updateRMDEData = (drives: RMDEDrive[]): RMDEDrive[] => {
   return drives.map(drive => {
-    // REDUCED frequency: Randomly update some values to simulate real-time changes
-    if (Math.random() > 0.85) { // Changed from 0.7 to 0.85 (less frequent updates)
-      // REDUCED change ranges for more stable values
-      const temperatureChange = Math.random() * 2 - 1; // Changed from 4-2 to 2-1 (smaller changes)
-      const powerChange = Math.random() * 10 - 5; // Changed from 20-10 to 10-5 (smaller changes)
-      const efficiencyChange = Math.random() * 2 - 1; // Changed from 4-2 to 2-1 (smaller changes)
+    // SIGNIFICANTLY REDUCED frequency: Randomly update some values to simulate real-time changes
+    if (Math.random() > 0.95) { // Changed from 0.85 to 0.95 (much less frequent updates)
+      // SIGNIFICANTLY REDUCED change ranges for very stable values
+      const temperatureChange = Math.random() * 0.5 - 0.25; // Changed from 2-1 to 0.5-0.25 (much smaller changes)
+      const powerChange = Math.random() * 3 - 1.5; // Changed from 10-5 to 3-1.5 (much smaller changes)
+      const efficiencyChange = Math.random() * 0.5 - 0.25; // Changed from 2-1 to 0.5-0.25 (much smaller changes)
       
       // Store current health score as previous DHI
       const previousDHI = drive.healthScore;
       
-      let newHealthScore = drive.healthScore + (Math.random() * 3 - 1.5); // Changed from 6-3 to 3-1.5 (smaller changes)
+      let newHealthScore = drive.healthScore + (Math.random() * 1 - 0.5); // Changed from 3-1.5 to 1-0.5 (much smaller changes)
       newHealthScore = Math.max(0, Math.min(100, newHealthScore));
       
       const newStatus = newHealthScore > 90 ? 'online' : 
                        newHealthScore > 80 ? 'warning' : 
                        newHealthScore > 70 ? 'error' : 'offline';
       
-      // Update new metrics with smaller changes
-      const responseTimeChange = Math.random() * 20 - 10; // Changed from 40-20 to 20-10
-      const vibrationChange = Number((Math.random() * 0.3 - 0.15).toFixed(2)); // Changed from 0.6-0.3 to 0.3-0.15
-      const loadCapacityChange = Math.random() * 3 - 1.5; // Changed from 6-3 to 3-1.5
+      // Update new metrics with much smaller changes
+      const responseTimeChange = Math.random() * 5 - 2.5; // Changed from 20-10 to 5-2.5
+      const vibrationChange = Number((Math.random() * 0.1 - 0.05).toFixed(2)); // Changed from 0.3-0.15 to 0.1-0.05
+      const loadCapacityChange = Math.random() * 1 - 0.5; // Changed from 3-1.5 to 1-0.5
       
-      // REDUCED error generation frequency
+      // MUCH REDUCED error generation frequency
       let newErrors = [...drive.errors];
-      if (Math.random() > 0.95 && newStatus !== 'online') { // Changed from 0.9 to 0.95 (less frequent errors)
+      if (Math.random() > 0.98 && newStatus !== 'online') { // Changed from 0.95 to 0.98 (much less frequent errors)
         const errorMessages = [
           'Temperature threshold exceeded',
           'Power fluctuation detected',
@@ -56,7 +56,7 @@ export const updateRMDEData = (drives: RMDEDrive[]): RMDEDrive[] => {
         efficiency: Math.max(50, Math.min(100, drive.efficiency + efficiencyChange)),
         healthScore: Math.round(newHealthScore),
         status: newStatus as 'online' | 'offline' | 'warning' | 'error',
-        operatingHours: drive.operatingHours + 0.005, // Reduced from 0.01 to 0.005
+        operatingHours: drive.operatingHours + 0.002, // Reduced from 0.005 to 0.002
         errors: newErrors,
         previousDHI,
         responseTime: drive.responseTime ? 
