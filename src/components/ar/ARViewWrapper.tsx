@@ -1,6 +1,6 @@
 
 import React, { Suspense } from 'react';
-import { AlertTriangle, Info, Camera3d } from 'lucide-react';
+import { AlertTriangle, Info, Camera } from 'lucide-react';
 import { RMDEDrive } from '@/utils/types/rmdeTypes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -114,7 +114,7 @@ const ARViewWrapper: React.FC<ARViewWrapperProps> = ({ drives, arMode, arError }
               <Card className="w-full max-w-md">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Camera3d className="h-5 w-5 text-purple-500" />
+                    <Camera className="h-5 w-5 text-purple-500" />
                     Drive Visualization
                   </CardTitle>
                 </CardHeader>

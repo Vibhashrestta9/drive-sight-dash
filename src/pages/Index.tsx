@@ -11,12 +11,17 @@ import DriveHealthIndex from '@/components/DriveHealthIndex';
 import BehavioralFingerprint from '@/components/BehavioralFingerprint';
 import DigitalTwinStatus from '@/components/DigitalTwinStatus';
 import SelfHealingSystem from '@/components/SelfHealingSystem';
+import UserRoleSelector from '@/components/UserRoleSelector';
+import PLCSimulationPanel from '@/components/PLCSimulationPanel';
+import RoleAwareControl from '@/components/RoleAwareControl';
 import { generateInitialRMDEData } from '@/utils/rmde/dataGenerator';
 import { updateRMDEData } from '@/utils/rmde/dataUpdater';
+import { useSimulatedPLC } from '@/hooks/useSimulatedPLC';
 import { useState, useEffect } from 'react';
 
 const Index = () => {
   const [rmdeData, setRmdeData] = useState(generateInitialRMDEData());
+  const { updateSimulatedDrives, isSimulating } = useSimulatedPLC();
   
   useEffect(() => {
     // This ensures we have consistent data across components
@@ -25,11 +30,15 @@ const Index = () => {
     
     // Set up interval for real-time updates
     const interval = setInterval(() => {
-      setRmdeData(prev => updateRMDEData(prev));
+      setRmdeData(prev => {
+        const updated = updateRMDEData(prev);
+        // Apply PLC simulation if enabled
+        return isSimulating ? updateSimulatedDrives(updated) : updated;
+      });
     }, 5000);
     
     return () => clearInterval(interval);
-  }, []);
+  }, [isSimulating, updateSimulatedDrives]);
   
   const handleHeal = (driveId: string, errorId: string) => {
     setRmdeData(prevData => {
@@ -57,20 +66,24 @@ const Index = () => {
             <p className="text-gray-600">Real-time monitoring and analytics for your fleet</p>
           </div>
           <div className="flex gap-3">
-            <Link 
-              to="/sim-configuration" 
-              className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-            >
-              <Network className="h-5 w-5" />
-              SIM Configuration
-            </Link>
-            <Link 
-              to="/cyber-security" 
-              className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
-            >
-              <Shield className="h-5 w-5" />
-              Cybersecurity
-            </Link>
+            <RoleAwareControl requiresWrite>
+              <Link 
+                to="/sim-configuration" 
+                className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+              >
+                <Network className="h-5 w-5" />
+                SIM Configuration
+              </Link>
+            </RoleAwareControl>
+            <RoleAwareControl requiresAdmin>
+              <Link 
+                to="/cyber-security" 
+                className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+              >
+                <Shield className="h-5 w-5" />
+                Cybersecurity
+              </Link>
+            </RoleAwareControl>
             <Link 
               to="/ar-dashboard" 
               className="flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
@@ -80,6 +93,12 @@ const Index = () => {
             </Link>
           </div>
         </header>
+
+        {/* Role-Based Access Control */}
+        <UserRoleSelector />
+        
+        {/* PLC Simulation Panel */}
+        <PLCSimulationPanel />
 
         {/* Metrics Summary Cards */}
         <DriveMetricsCards />
@@ -99,7 +118,9 @@ const Index = () => {
         
         {/* Self Healing System */}
         <div className="mb-6">
-          <SelfHealingSystem drives={rmdeData} onHeal={handleHeal} />
+          <RoleAwareControl requiresWrite>
+            <SelfHealingSystem drives={rmdeData} onHeal={handleHeal} />
+          </RoleAwareControl>
         </div>
         
         {/* Digital Twin Status Section */}
@@ -119,7 +140,9 @@ const Index = () => {
         
         {/* RMDE Dashboard Section */}
         <div className="mb-6">
-          <RMDEDashboard />
+          <RoleAwareControl requiresWrite>
+            <RMDEDashboard />
+          </RoleAwareControl>
         </div>
 
         {/* Driver Performance Section */}
