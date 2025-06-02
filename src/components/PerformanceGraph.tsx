@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -117,7 +116,7 @@ const PerformanceGraph = () => {
           <TabsList className="mb-4">
             <TabsTrigger value="speed">Speed</TabsTrigger>
             <TabsTrigger value="distance">Distance</TabsTrigger>
-            <TabsTrigger value="fuel">Fuel Economy</TabsTrigger>
+            <TabsTrigger value="fuel">Energy Efficiency</TabsTrigger>
           </TabsList>
           <TabsContent value="speed" className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -133,6 +132,12 @@ const PerformanceGraph = () => {
                   textAnchor="end"
                   height={60}
                   interval={0}
+                  label={{ 
+                    value: 'Time', 
+                    position: 'insideBottom', 
+                    offset: -10,
+                    style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
+                  }}
                 />
                 <YAxis 
                   tick={{ fontSize: 12 }}
@@ -175,6 +180,12 @@ const PerformanceGraph = () => {
                   textAnchor="end"
                   height={60}
                   interval={0}
+                  label={{ 
+                    value: 'Time', 
+                    position: 'insideBottom', 
+                    offset: -10,
+                    style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
+                  }}
                 />
                 <YAxis 
                   tick={{ fontSize: 12 }}
@@ -217,12 +228,18 @@ const PerformanceGraph = () => {
                   textAnchor="end"
                   height={60}
                   interval={0}
+                  label={{ 
+                    value: 'Time', 
+                    position: 'insideBottom', 
+                    offset: -10,
+                    style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
+                  }}
                 />
                 <YAxis 
                   tick={{ fontSize: 12 }}
                   width={50}
                   label={{ 
-                    value: 'Fuel Economy (mpg)', 
+                    value: 'Energy Efficiency (mpg)', 
                     angle: -90, 
                     position: 'insideLeft',
                     style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
@@ -230,7 +247,7 @@ const PerformanceGraph = () => {
                 />
                 <Tooltip
                   contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc' }}
-                  formatter={(value) => [`${value} mpg`, 'Fuel Economy']}
+                  formatter={(value) => [`${value} mpg`, 'Energy Efficiency']}
                   labelStyle={{ fontWeight: 'bold' }}
                 />
                 <Bar 
