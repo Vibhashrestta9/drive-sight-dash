@@ -123,28 +123,39 @@ const PerformanceGraph = () => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={data}
-                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                margin={{ top: 20, right: 30, left: 40, bottom: 60 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                 <XAxis 
                   dataKey="time" 
-                  label={{ value: 'Time', position: 'insideBottom', offset: -5 }}
+                  tick={{ fontSize: 12 }}
+                  angle={-45}
+                  textAnchor="end"
+                  height={60}
+                  interval={0}
                 />
                 <YAxis 
-                  domain={[0, 'auto']} 
-                  label={{ value: 'Speed (mph)', angle: -90, position: 'insideLeft' }}
+                  tick={{ fontSize: 12 }}
+                  width={50}
+                  label={{ 
+                    value: 'Speed (mph)', 
+                    angle: -90, 
+                    position: 'insideLeft',
+                    style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
+                  }}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
+                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc' }}
                   formatter={(value) => [`${value} mph`, 'Speed']}
+                  labelStyle={{ fontWeight: 'bold' }}
                 />
                 <Line
                   type="monotone"
                   dataKey="speed"
                   stroke={getChartColor()}
-                  strokeWidth={2}
-                  dot={{ r: 2 }}
-                  activeDot={{ r: 4 }}
+                  strokeWidth={3}
+                  dot={{ r: 3, fill: getChartColor() }}
+                  activeDot={{ r: 5, fill: getChartColor() }}
                   isAnimationActive={false}
                 />
               </LineChart>
@@ -154,28 +165,39 @@ const PerformanceGraph = () => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={data}
-                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                margin={{ top: 20, right: 30, left: 40, bottom: 60 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                 <XAxis 
                   dataKey="time" 
-                  label={{ value: 'Time', position: 'insideBottom', offset: -5 }}
+                  tick={{ fontSize: 12 }}
+                  angle={-45}
+                  textAnchor="end"
+                  height={60}
+                  interval={0}
                 />
                 <YAxis 
-                  domain={[0, 'auto']} 
-                  label={{ value: 'Distance (miles)', angle: -90, position: 'insideLeft' }}
+                  tick={{ fontSize: 12 }}
+                  width={50}
+                  label={{ 
+                    value: 'Distance (miles)', 
+                    angle: -90, 
+                    position: 'insideLeft',
+                    style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
+                  }}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
+                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc' }}
                   formatter={(value) => [`${value} miles`, 'Distance']}
+                  labelStyle={{ fontWeight: 'bold' }}
                 />
                 <Line
                   type="monotone"
                   dataKey="distance"
                   stroke={getChartColor()}
-                  strokeWidth={2}
-                  dot={{ r: 2 }}
-                  activeDot={{ r: 4 }}
+                  strokeWidth={3}
+                  dot={{ r: 3, fill: getChartColor() }}
+                  activeDot={{ r: 5, fill: getChartColor() }}
                   isAnimationActive={false}
                 />
               </LineChart>
@@ -185,22 +207,37 @@ const PerformanceGraph = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={data}
-                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                margin={{ top: 20, right: 30, left: 40, bottom: 60 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                 <XAxis 
                   dataKey="time" 
-                  label={{ value: 'Time', position: 'insideBottom', offset: -5 }}
+                  tick={{ fontSize: 12 }}
+                  angle={-45}
+                  textAnchor="end"
+                  height={60}
+                  interval={0}
                 />
                 <YAxis 
-                  domain={[0, 40]} 
-                  label={{ value: 'Fuel Economy (mpg)', angle: -90, position: 'insideLeft' }}
+                  tick={{ fontSize: 12 }}
+                  width={50}
+                  label={{ 
+                    value: 'Fuel Economy (mpg)', 
+                    angle: -90, 
+                    position: 'insideLeft',
+                    style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
+                  }}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
+                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc' }}
                   formatter={(value) => [`${value} mpg`, 'Fuel Economy']}
+                  labelStyle={{ fontWeight: 'bold' }}
                 />
-                <Bar dataKey="fuel" fill={getChartColor()} />
+                <Bar 
+                  dataKey="fuel" 
+                  fill={getChartColor()}
+                  radius={[2, 2, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </TabsContent>
