@@ -35,10 +35,10 @@ const generateRandomErrors = (count: number): RMDEError[] => {
  * Generates initial mock RMDE drive data
  */
 export const generateInitialRMDEData = (): RMDEDrive[] => {
-  const moduleIds = ['NETA-21-A', 'NETA-21-B', 'NETA-21-C'];
+  const moduleIds = ['CONNECT-21-A', 'CONNECT-21-B', 'CONNECT-21-C'];
   const driveNames = [
-    'GIRISHA CD', 'MOHAN', 'BABITHA', 
-    'ANATH N', 'VIBHA SHRESTTA'
+    'Drive1', 'Drive2', 'Drive3', 
+    'Drive4', 'Drive5'
   ];
   
   return driveNames.map((name, index) => {
@@ -74,10 +74,10 @@ export const generateInitialRMDEData = (): RMDEDrive[] => {
 };
 
 /**
- * Generate mock NETA-21 modules data
+ * Generate mock CONNECT-21 modules data
  */
 export const generateNETAModules = (): RMDEModule[] => {
-  const moduleIds = ['NETA-21-A', 'NETA-21-B', 'NETA-21-C'];
+  const moduleIds = ['CONNECT-21-A', 'CONNECT-21-B', 'CONNECT-21-C'];
   
   return moduleIds.map((id, index) => {
     const ipOctet = 100 + index;

@@ -68,9 +68,8 @@ const SelfHealingSystem = ({ drives, onHeal }: SelfHealingSystemProps) => {
                   </div>
                   <Badge className="bg-red-600 text-white border-red-500">Critical</Badge>
                 </div>
-                <Separator className="my-3 bg-white/20" />
                 <div className="text-white/80 mb-4">
-                  Timestamp: {new Date(error.timestamp).toLocaleString()}
+                  Drive ID: {error.driveId}
                 </div>
                 <Button 
                   className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-300"

@@ -16,10 +16,10 @@ const DriverList = ({ drivers }: DriverListProps) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-medium">Connected Drivers</h3>
-        <Link to="/neta21-manual">
+        <Link to="/connect-manual">
           <Button variant="outline" size="sm" className="flex items-center gap-2">
             <BookOpen className="h-4 w-4" />
-            NETA-21 Manual
+            CONNECT-21 Manual
           </Button>
         </Link>
       </div>
