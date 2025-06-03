@@ -10,7 +10,6 @@ import RMDEDashboard from '@/components/RMDEDashboard';
 import DriveHealthIndex from '@/components/DriveHealthIndex';
 import BehavioralFingerprint from '@/components/BehavioralFingerprint';
 import DigitalTwinStatus from '@/components/DigitalTwinStatus';
-import SelfHealingSystem from '@/components/SelfHealingSystem';
 import UserRoleSelector from '@/components/UserRoleSelector';
 import PLCSimulationPanel from '@/components/PLCSimulationPanel';
 import RoleAwareControl from '@/components/RoleAwareControl';
@@ -39,23 +38,6 @@ const Index = () => {
     
     return () => clearInterval(interval);
   }, [isSimulating, updateSimulatedDrives]);
-  
-  const handleHeal = (driveId: string, errorId: string) => {
-    setRmdeData(prevData => {
-      return prevData.map(drive => {
-        if (drive.id.toString() === driveId) {
-          const updatedErrors = drive.errors.map(error => {
-            if (error.id.toString() === errorId) {
-              return { ...error, resolved: true };
-            }
-            return error;
-          });
-          return { ...drive, errors: updatedErrors };
-        }
-        return drive;
-      });
-    });
-  };
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100">
@@ -122,13 +104,6 @@ const Index = () => {
           <div className="grid grid-cols-1 gap-6 bg-gradient-to-br from-cyan-100 to-blue-100 rounded-xl p-1">
             <LiveDrivers />
           </div>
-        </div>
-        
-        {/* Self Healing System */}
-        <div className="mb-6">
-          <RoleAwareControl requiresWrite>
-            <SelfHealingSystem drives={rmdeData} onHeal={handleHeal} />
-          </RoleAwareControl>
         </div>
         
         {/* Digital Twin Status Section */}
