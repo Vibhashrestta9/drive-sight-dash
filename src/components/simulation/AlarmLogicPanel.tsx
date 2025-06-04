@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Trash2, bell, Volume2, Mail, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, Bell, Volume2, Mail, AlertTriangle } from 'lucide-react';
 import { AlarmRule, AlarmAction } from '@/types/advancedSimulationTypes';
 
 interface AlarmLogicPanelProps {
@@ -20,7 +20,7 @@ const AlarmLogicPanel = ({ rules, activeAlarms, onRulesChange }: AlarmLogicPanel
   const [editingRule, setEditingRule] = useState<AlarmRule | null>(null);
 
   const actionTypes = [
-    { value: 'notification', label: 'Show Notification', icon: bell },
+    { value: 'notification', label: 'Show Notification', icon: Bell },
     { value: 'email', label: 'Send Email', icon: Mail },
     { value: 'buzzer', label: 'Sound Buzzer', icon: Volume2 },
     { value: 'shutdown', label: 'Emergency Shutdown', icon: AlertTriangle }
@@ -99,7 +99,7 @@ const AlarmLogicPanel = ({ rules, activeAlarms, onRulesChange }: AlarmLogicPanel
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <bell className="h-5 w-5" />
+          <Bell className="h-5 w-5" />
           Customizable Alarm Logic
         </CardTitle>
         <CardDescription>

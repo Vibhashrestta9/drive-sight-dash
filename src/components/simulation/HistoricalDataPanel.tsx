@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { History, Play, Pause, Square, Download, Compare } from 'lucide-react';
+import { History, Play, Pause, Square, Download } from 'lucide-react';
 import { HistoricalDataPoint } from '@/types/advancedSimulationTypes';
 
 interface HistoricalDataPanelProps {

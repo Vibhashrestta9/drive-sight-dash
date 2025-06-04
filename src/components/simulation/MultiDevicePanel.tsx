@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { Plus, Trash2, monitor, Play, Pause, Square, Cpu } from 'lucide-react';
+import { Plus, Trash2, Monitor, Play, Pause, Square, Cpu } from 'lucide-react';
 import { SimulationDevice } from '@/types/advancedSimulationTypes';
 
 interface MultiDevicePanelProps {
@@ -73,7 +72,7 @@ const MultiDevicePanel = ({ devices, onDevicesChange }: MultiDevicePanelProps) =
       device.id === deviceId 
         ? { 
             ...device, 
-            status: device.status === 'online' ? 'offline' : 'online',
+            status: device.status === 'online' ? 'offline' as const : 'online' as const,
             lastUpdate: new Date()
           }
         : device
@@ -144,7 +143,7 @@ const MultiDevicePanel = ({ devices, onDevicesChange }: MultiDevicePanelProps) =
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <monitor className="h-5 w-5" />
+          <Monitor className="h-5 w-5" />
           Multi-Device Simulation
           {groupControl.isRunning && (
             <Badge className="bg-blue-100 text-blue-800">
@@ -225,7 +224,7 @@ const MultiDevicePanel = ({ devices, onDevicesChange }: MultiDevicePanelProps) =
           
           {devices.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              <monitor className="h-8 w-8 mx-auto mb-2" />
+              <Monitor className="h-8 w-8 mx-auto mb-2" />
               <p>No devices configured</p>
               <p className="text-sm">Add devices to simulate a multi-device environment</p>
             </div>
