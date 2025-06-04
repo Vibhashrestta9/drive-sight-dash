@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Settings, Activity, AlertTriangle, TrendingUp, Network, Brain, bell, Gauge, monitor } from 'lucide-react';
+import { Settings, Activity, AlertTriangle, TrendingUp, Network, Brain, Bell, Gauge, Monitor } from 'lucide-react';
 import { useAdvancedPLCSimulation } from '@/hooks/useAdvancedPLCSimulation';
 import ParameterProfilesPanel from './ParameterProfilesPanel';
 import ParameterInteractionsPanel from './ParameterInteractionsPanel';
@@ -50,7 +49,7 @@ const AdvancedPLCSimulationPanel = () => {
               <span className="hidden sm:inline">Faults</span>
             </TabsTrigger>
             <TabsTrigger value="alarms" className="flex items-center gap-1">
-              <bell className="h-4 w-4" />
+              <Bell className="h-4 w-4" />
               <span className="hidden sm:inline">Alarms</span>
             </TabsTrigger>
             <TabsTrigger value="history" className="flex items-center gap-1">
@@ -74,7 +73,7 @@ const AdvancedPLCSimulationPanel = () => {
               <span className="hidden sm:inline">Config</span>
             </TabsTrigger>
             <TabsTrigger value="devices" className="flex items-center gap-1">
-              <monitor className="h-4 w-4" />
+              <Monitor className="h-4 w-4" />
               <span className="hidden sm:inline">Devices</span>
             </TabsTrigger>
           </TabsList>

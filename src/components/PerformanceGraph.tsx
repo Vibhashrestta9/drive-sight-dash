@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,19 +15,19 @@ const generateData = (points: number): DataPoint[] => {
   const data: DataPoint[] = [];
   const now = new Date();
   
-  for (let i = points; i >= 0; i--) {
-    const time = new Date(now.getTime() - i * 60000);
+  for (let i = 0; i <= points; i++) {
+    const time = new Date(now.getTime() - (points - i) * 60000);
     const timeString = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     
     // Simulate some realistic driving data with some randomness
     let speed = 35 + Math.sin(i / 2) * 15 + (Math.random() * 10 - 5);
-    const distance = i === points ? 0 : data[0].distance + speed / 60; // Distance traveled in last minute
+    const distance = i === 0 ? 0 : data[i - 1].distance + speed / 60; // Distance traveled in last minute
     const fuel = 30 - (i / points) * 5 + (Math.random() * 2 - 1);
     
     // Clamp speed to be realistic
     speed = Math.max(0, Math.min(70, speed));
     
-    data.unshift({
+    data.push({
       time: timeString,
       speed: Math.round(speed),
       distance: parseFloat(distance.toFixed(1)),
