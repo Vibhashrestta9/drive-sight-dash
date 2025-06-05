@@ -11,7 +11,7 @@ export const useVFDSimulation = () => {
     torque: 0,
     speed: 0,
     temperature: 25,
-    dcBusVoltage: 0,
+    dcBusVoltage: 650,
     outputVoltage: 0,
     motorTemperature: 25,
     efficiency: 0
@@ -56,27 +56,26 @@ export const useVFDSimulation = () => {
     thermalShutdownRisk: 0
   });
 
-  const intervalRef = useRef<NodeJS.Timeout>();
-  const startTimeRef = useRef<Date>();
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const targetFrequency = useRef(0);
 
-  const calculateVFRatio = () => {
+  const calculateVFRatio = (frequency: number) => {
     const baseFreq = 60; // Hz
     const baseVolt = 460; // V
     
     switch (parameters.vfProfile) {
       case 'constant':
-        return (state.frequency / baseFreq) * baseVolt;
+        return (frequency / baseFreq) * baseVolt;
       case 'variable-torque':
-        return Math.pow(state.frequency / baseFreq, 2) * baseVolt;
+        return Math.pow(frequency / baseFreq, 2) * baseVolt;
       case 'sensorless-vector':
-        return (state.frequency / baseFreq) * baseVolt * (0.9 + 0.1 * Math.random());
+        return (frequency / baseFreq) * baseVolt * (0.9 + 0.1 * Math.random());
       default:
         return 0;
     }
   };
 
-  const calculateMotorResponse = () => {
+  const calculateMotorResponse = (frequency: number) => {
     const baseSpeed = 1800; // RPM
     let torqueMultiplier = 1;
 
@@ -85,7 +84,7 @@ export const useVFDSimulation = () => {
         torqueMultiplier = 1;
         break;
       case 'variable-torque':
-        torqueMultiplier = Math.pow(state.frequency / 60, 2);
+        torqueMultiplier = Math.pow(frequency / 60, 2);
         break;
       case 'shock-load':
         torqueMultiplier = 1 + 0.3 * Math.sin(Date.now() / 1000);
@@ -93,17 +92,17 @@ export const useVFDSimulation = () => {
     }
 
     return {
-      speed: (state.frequency / 60) * baseSpeed,
-      torque: parameters.maxTorque * torqueMultiplier * (state.frequency / 60),
-      current: 10 + (state.frequency / 60) * 15 * torqueMultiplier
+      speed: (frequency / 60) * baseSpeed,
+      torque: parameters.maxTorque * torqueMultiplier * (frequency / 60),
+      current: 10 + (frequency / 60) * 15 * torqueMultiplier
     };
   };
 
-  const checkFaultConditions = () => {
+  const checkFaultConditions = (currentState: VFDState) => {
     const faults: FaultCode[] = [];
 
     // Overvoltage
-    if (state.dcBusVoltage > 800) {
+    if (currentState.dcBusVoltage > 800) {
       faults.push({
         code: 'F001',
         description: 'DC Bus Overvoltage',
@@ -114,7 +113,7 @@ export const useVFDSimulation = () => {
     }
 
     // Overcurrent
-    if (state.current > 50) {
+    if (currentState.current > 50) {
       faults.push({
         code: 'F002',
         description: 'Output Overcurrent',
@@ -125,7 +124,7 @@ export const useVFDSimulation = () => {
     }
 
     // Overtemperature
-    if (state.temperature > 85) {
+    if (currentState.temperature > 85) {
       faults.push({
         code: 'F003',
         description: 'Drive Overtemperature',
@@ -135,7 +134,7 @@ export const useVFDSimulation = () => {
       });
     }
 
-    // Phase loss simulation
+    // Phase loss simulation (rare random fault)
     if (Math.random() < 0.001) {
       faults.push({
         code: 'F004',
@@ -150,70 +149,78 @@ export const useVFDSimulation = () => {
   };
 
   const updateSimulation = () => {
-    if (state.status !== 'running') return;
+    setState(prevState => {
+      if (prevState.status !== 'running') return prevState;
 
-    const motorResponse = calculateMotorResponse();
-    const outputVoltage = calculateVFRatio();
+      const motorResponse = calculateMotorResponse(prevState.frequency);
+      const outputVoltage = calculateVFRatio(prevState.frequency);
 
-    // Simulate ramping
-    let currentFreq = state.frequency;
-    if (currentFreq < targetFrequency.current) {
-      currentFreq = Math.min(targetFrequency.current, currentFreq + (60 / parameters.rampUpTime) / 10);
-    } else if (currentFreq > targetFrequency.current) {
-      currentFreq = Math.max(targetFrequency.current, currentFreq - (60 / parameters.rampDownTime) / 10);
-    }
+      // Simulate ramping
+      let currentFreq = prevState.frequency;
+      if (currentFreq < targetFrequency.current) {
+        currentFreq = Math.min(targetFrequency.current, currentFreq + (60 / parameters.rampUpTime) / 10);
+      } else if (currentFreq > targetFrequency.current) {
+        currentFreq = Math.max(targetFrequency.current, currentFreq - (60 / parameters.rampDownTime) / 10);
+      }
 
-    // Calculate harmonics based on switching frequency
-    const switchingFreq = 4000; // Hz
-    const thd = 5 + (state.frequency / 60) * 10 + Math.random() * 2;
+      const newState = {
+        ...prevState,
+        frequency: currentFreq,
+        voltage: outputVoltage,
+        speed: motorResponse.speed,
+        torque: motorResponse.torque,
+        current: motorResponse.current,
+        power: outputVoltage * motorResponse.current * Math.sqrt(3) * 0.001,
+        dcBusVoltage: 650 + Math.random() * 50,
+        outputVoltage,
+        temperature: 25 + (prevState.power / 1000) * 10 + Math.random() * 5,
+        motorTemperature: 25 + (prevState.power / 1000) * 15 + Math.random() * 8,
+        efficiency: Math.max(80, 95 - (prevState.power / 1000) * 2)
+      };
 
-    // Update cooling system
-    const requiredCooling = (state.power / 1000) * 0.03; // 3% losses as heat
-    const fanSpeed = Math.min(100, requiredCooling * 20);
+      // Calculate harmonics based on switching frequency
+      const thd = 5 + (currentFreq / 60) * 10 + Math.random() * 2;
+      setHarmonics({
+        thd,
+        h3: thd * 0.3,
+        h5: thd * 0.6,
+        h7: thd * 0.2
+      });
 
-    setState(prev => ({
-      ...prev,
-      frequency: currentFreq,
-      voltage: outputVoltage,
-      speed: motorResponse.speed,
-      torque: motorResponse.torque,
-      current: motorResponse.current,
-      power: outputVoltage * motorResponse.current * Math.sqrt(3) * 0.001,
-      dcBusVoltage: 650 + Math.random() * 50,
-      outputVoltage,
-      temperature: 25 + (state.power / 1000) * 10 + Math.random() * 5,
-      motorTemperature: 25 + (state.power / 1000) * 15 + Math.random() * 8,
-      efficiency: Math.max(80, 95 - (state.power / 1000) * 2)
-    }));
+      // Update cooling system
+      const requiredCooling = (newState.power / 1000) * 0.03; // 3% losses as heat
+      const fanSpeed = Math.min(100, requiredCooling * 20);
 
-    setHarmonics({
-      thd,
-      h3: thd * 0.3,
-      h5: thd * 0.6,
-      h7: thd * 0.2
+      setCooling(prev => ({
+        ...prev,
+        fanSpeed,
+        airflow: Math.max(20, 100 - (newState.temperature - 25) * 2),
+        thermalShutdownRisk: Math.max(0, (newState.temperature - 70) / 15 * 100)
+      }));
+
+      // Update lifetime data
+      setLifetimeData(prev => ({
+        ...prev,
+        runningHours: prev.runningHours + (1/3600), // 1 second in hours
+        switchingCycles: prev.switchingCycles + 4000 / 10, // 4kHz switching frequency
+        estimatedLife: Math.max(0, 100 - (prev.runningHours / 87600) * 100) // 10 years
+      }));
+
+      checkFaultConditions(newState);
+      return newState;
     });
-
-    setCooling(prev => ({
-      ...prev,
-      fanSpeed,
-      airflow: Math.max(20, 100 - (state.temperature - 25) * 2),
-      thermalShutdownRisk: Math.max(0, (state.temperature - 70) / 15 * 100)
-    }));
-
-    // Update lifetime data
-    setLifetimeData(prev => ({
-      ...prev,
-      runningHours: prev.runningHours + (1/3600), // 1 second in hours
-      switchingCycles: prev.switchingCycles + switchingFreq / 10,
-      estimatedLife: Math.max(0, 100 - (prev.runningHours / 87600) * 100) // 10 years
-    }));
-
-    checkFaultConditions();
   };
 
   const startDrive = (frequency: number) => {
+    console.log('Starting VFD with frequency:', frequency);
+    
     if (activeFaults.some(f => f.severity === 'critical')) {
       console.log('Cannot start drive - critical faults present');
+      return;
+    }
+
+    if (frequency <= 0) {
+      console.log('Cannot start drive - frequency must be greater than 0');
       return;
     }
 
@@ -222,23 +229,31 @@ export const useVFDSimulation = () => {
     
     if (!intervalRef.current) {
       intervalRef.current = setInterval(updateSimulation, 100);
+      console.log('VFD simulation started');
     }
   };
 
   const stopDrive = () => {
+    console.log('Stopping VFD');
     targetFrequency.current = 0;
-    setState(prev => ({ ...prev, status: 'stopped' }));
     
     // Keep running simulation until frequency reaches 0
-    setTimeout(() => {
-      if (intervalRef.current && state.frequency <= 0.1) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = undefined;
-      }
-    }, parameters.rampDownTime * 1000);
+    const stopTimeout = setTimeout(() => {
+      setState(prev => {
+        if (prev.frequency <= 0.1) {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+          return { ...prev, status: 'stopped' };
+        }
+        return prev;
+      });
+    }, parameters.rampDownTime * 100);
   };
 
   const emergencyStop = () => {
+    console.log('Emergency stop activated');
     targetFrequency.current = 0;
     setState(prev => ({ 
       ...prev, 
@@ -252,16 +267,18 @@ export const useVFDSimulation = () => {
     
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
-      intervalRef.current = undefined;
+      intervalRef.current = null;
     }
   };
 
   const clearFaults = () => {
+    console.log('Clearing VFD faults');
     setActiveFaults([]);
     setState(prev => ({ ...prev, status: 'stopped' }));
   };
 
   const injectFault = (faultCode: string) => {
+    console.log('Injecting fault:', faultCode);
     const predefinedFaults = {
       'F001': { code: 'F001', description: 'DC Bus Overvoltage', severity: 'critical' as const },
       'F002': { code: 'F002', description: 'Output Overcurrent', severity: 'critical' as const },
