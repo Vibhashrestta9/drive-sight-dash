@@ -13,6 +13,7 @@ import DigitalTwinStatus from '@/components/DigitalTwinStatus';
 import UserRoleSelector from '@/components/UserRoleSelector';
 import PLCSimulationPanel from '@/components/PLCSimulationPanel';
 import AdvancedPLCSimulationPanel from '@/components/simulation/AdvancedPLCSimulationPanel';
+import VFDSimulationPanel from '@/components/simulation/VFDSimulationPanel';
 import RoleAwareControl from '@/components/RoleAwareControl';
 import { generateInitialRMDEData } from '@/utils/rmde/dataGenerator';
 import { updateRMDEData } from '@/utils/rmde/dataUpdater';
@@ -93,6 +94,13 @@ const Index = () => {
         <RoleAwareControl requiresWrite>
           <div className="mb-6 bg-gradient-to-r from-purple-100 via-indigo-100 to-blue-100 rounded-xl p-1">
             <AdvancedPLCSimulationPanel />
+          </div>
+        </RoleAwareControl>
+
+        {/* VFD Simulation Suite */}
+        <RoleAwareControl requiresWrite>
+          <div className="mb-6 bg-gradient-to-r from-cyan-100 via-blue-100 to-indigo-100 rounded-xl p-1">
+            <VFDSimulationPanel />
           </div>
         </RoleAwareControl>
 
