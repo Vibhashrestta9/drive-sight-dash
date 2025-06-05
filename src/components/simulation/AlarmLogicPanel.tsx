@@ -198,7 +198,7 @@ const AlarmLogicPanel = ({ rules, activeAlarms, onRulesChange }: AlarmLogicPanel
                     <div className="flex flex-wrap gap-2">
                       {rule.actions.map((action, index) => {
                         const actionType = actionTypes.find(t => t.value === action.type);
-                        const Icon = actionType?.icon || bell;
+                        const Icon = actionType?.icon || Bell;
                         return (
                           <Badge key={index} variant="outline">
                             <Icon className="h-3 w-3 mr-1" />
@@ -291,7 +291,7 @@ const AlarmLogicPanel = ({ rules, activeAlarms, onRulesChange }: AlarmLogicPanel
                 <div className="space-y-2">
                   {editingRule.actions.map((action, index) => {
                     const actionType = actionTypes.find(t => t.value === action.type);
-                    const Icon = actionType?.icon || bell;
+                    const Icon = actionType?.icon || Bell;
                     return (
                       <div key={index} className="flex items-center gap-2 p-2 border rounded">
                         <Icon className="h-4 w-4" />

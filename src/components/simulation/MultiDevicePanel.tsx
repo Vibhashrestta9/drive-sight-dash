@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -72,7 +73,7 @@ const MultiDevicePanel = ({ devices, onDevicesChange }: MultiDevicePanelProps) =
       device.id === deviceId 
         ? { 
             ...device, 
-            status: device.status === 'online' ? 'offline' as const : 'online' as const,
+            status: (device.status === 'online' ? 'offline' : 'online') as 'online' | 'offline' | 'error',
             lastUpdate: new Date()
           }
         : device
