@@ -74,7 +74,10 @@ const VFDVisualizationPanel = ({ vfd }: VFDVisualizationPanelProps) => {
                   label={{ value: 'Flux Component', angle: -90, position: 'insideLeft' }}
                 />
                 <Tooltip 
-                  formatter={(value, name) => [`${value?.toFixed(1)}`, name === 'flux' ? 'Flux' : 'Torque']}
+                  formatter={(value, name) => [
+                    `${typeof value === 'number' ? value.toFixed(1) : value}`, 
+                    name === 'flux' ? 'Flux' : 'Torque'
+                  ]}
                 />
                 <Line 
                   type="monotone" 
@@ -113,7 +116,10 @@ const VFDVisualizationPanel = ({ vfd }: VFDVisualizationPanelProps) => {
                   label={{ value: 'Magnitude (%)', angle: -90, position: 'insideLeft' }}
                 />
                 <Tooltip 
-                  formatter={(value) => [`${value?.toFixed(1)}%`, 'Magnitude']}
+                  formatter={(value) => [
+                    `${typeof value === 'number' ? value.toFixed(1) : value}%`, 
+                    'Magnitude'
+                  ]}
                 />
                 <Bar dataKey="magnitude" fill="#8884d8" />
               </BarChart>
@@ -147,7 +153,7 @@ const VFDVisualizationPanel = ({ vfd }: VFDVisualizationPanelProps) => {
                 />
                 <Tooltip 
                   formatter={(value, name) => [
-                    `${value?.toFixed(1)} ${name === 'voltage' ? 'V' : 'Hz'}`, 
+                    `${typeof value === 'number' ? value.toFixed(1) : value} ${name === 'voltage' ? 'V' : 'Hz'}`, 
                     name === 'voltage' ? 'Voltage' : 'Frequency'
                   ]}
                 />
