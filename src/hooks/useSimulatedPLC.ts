@@ -45,6 +45,7 @@ export const useSimulatedPLC = () => {
   // Simulate register changes
   useEffect(() => {
     if (config.enabled) {
+      console.log('Starting PLC simulation with interval:', config.updateInterval);
       intervalRef.current = setInterval(() => {
         setRegisters(prev => prev.map(register => {
           let newValue = register.value;
@@ -74,7 +75,9 @@ export const useSimulatedPLC = () => {
       }, config.updateInterval);
     } else {
       if (intervalRef.current) {
+        console.log('Stopping PLC simulation');
         clearInterval(intervalRef.current);
+        intervalRef.current = undefined;
       }
     }
     
@@ -109,13 +112,16 @@ export const useSimulatedPLC = () => {
       }
     });
     
-    setAlarms(newAlarms);
-    
-    // Trigger buzzer if alarms exist
-    if (newAlarms.length > 0 && config.buzzerEnabled) {
-      triggerBuzzer();
+    if (newAlarms.length !== alarms.length || !newAlarms.every((alarm, index) => alarm === alarms[index])) {
+      console.log('Alarm status changed:', newAlarms);
+      setAlarms(newAlarms);
+      
+      // Trigger buzzer if alarms exist and buzzer is enabled
+      if (newAlarms.length > 0 && config.buzzerEnabled && newAlarms.length > alarms.length) {
+        triggerBuzzer();
+      }
     }
-  }, [registers, config.alarmThresholds, config.buzzerEnabled]);
+  }, [registers, config.alarmThresholds, config.buzzerEnabled, alarms]);
   
   const triggerBuzzer = async () => {
     try {

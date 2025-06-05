@@ -11,8 +11,7 @@ import DriveHealthIndex from '@/components/DriveHealthIndex';
 import BehavioralFingerprint from '@/components/BehavioralFingerprint';
 import DigitalTwinStatus from '@/components/DigitalTwinStatus';
 import UserRoleSelector from '@/components/UserRoleSelector';
-import PLCSimulationPanel from '@/components/PLCSimulationPanel';
-import AdvancedPLCSimulationPanel from '@/components/simulation/AdvancedPLCSimulationPanel';
+import UnifiedPLCSimulationPanel from '@/components/simulation/UnifiedPLCSimulationPanel';
 import VFDSimulationPanel from '@/components/simulation/VFDSimulationPanel';
 import RoleAwareControl from '@/components/RoleAwareControl';
 import { generateInitialRMDEData } from '@/utils/rmde/dataGenerator';
@@ -85,17 +84,10 @@ const Index = () => {
           <UserRoleSelector />
         </div>
         
-        {/* Basic PLC Simulation Panel */}
+        {/* Unified PLC Simulation Panel */}
         <div className="mb-6 bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl p-1">
-          <PLCSimulationPanel />
+          <UnifiedPLCSimulationPanel />
         </div>
-
-        {/* Advanced PLC Simulation Suite */}
-        <RoleAwareControl requiresWrite>
-          <div className="mb-6 bg-gradient-to-r from-purple-100 via-indigo-100 to-blue-100 rounded-xl p-1">
-            <AdvancedPLCSimulationPanel />
-          </div>
-        </RoleAwareControl>
 
         {/* VFD Simulation Suite */}
         <RoleAwareControl requiresWrite>
