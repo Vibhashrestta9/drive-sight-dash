@@ -144,7 +144,7 @@ const PerformanceGraph = () => {
                   tick={{ fontSize: 12 }}
                   width={50}
                   label={{ 
-                    value: 'Speed (mph)', 
+                    value: 'Speed (m/s)', 
                     angle: -90, 
                     position: 'insideLeft',
                     style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
@@ -152,7 +152,7 @@ const PerformanceGraph = () => {
                 />
                 <Tooltip
                   contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc' }}
-                  formatter={(value) => [`${value} mph`, 'Speed']}
+                  formatter={(value) => [`${value} m/s`, 'Speed']}
                   labelStyle={{ fontWeight: 'bold' }}
                 />
                 <Line
@@ -192,7 +192,7 @@ const PerformanceGraph = () => {
                   tick={{ fontSize: 12 }}
                   width={50}
                   label={{ 
-                    value: 'Distance (miles)', 
+                    value: 'Distance (m)', 
                     angle: -90, 
                     position: 'insideLeft',
                     style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
@@ -200,7 +200,7 @@ const PerformanceGraph = () => {
                 />
                 <Tooltip
                   contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc' }}
-                  formatter={(value) => [`${value} miles`, 'Distance']}
+                  formatter={(value) => [`${value} m`, 'Distance']}
                   labelStyle={{ fontWeight: 'bold' }}
                 />
                 <Line
@@ -240,7 +240,7 @@ const PerformanceGraph = () => {
                   tick={{ fontSize: 12 }}
                   width={50}
                   label={{ 
-                    value: 'Energy Efficiency (mpg)', 
+                    value: 'Energy Efficiency (%)', 
                     angle: -90, 
                     position: 'insideLeft',
                     style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
@@ -248,7 +248,7 @@ const PerformanceGraph = () => {
                 />
                 <Tooltip
                   contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc' }}
-                  formatter={(value) => [`${value} mpg`, 'Energy Efficiency']}
+                  formatter={(value) => [`${value}%`, 'Energy Efficiency']}
                   labelStyle={{ fontWeight: 'bold' }}
                 />
                 <Bar 
