@@ -22,14 +22,14 @@ const DigitalTwinStatus = () => {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Digital Twin Status</CardTitle>
+            <CardTitle>Virtual Based System Status</CardTitle>
             <CardDescription>Edge and cloud model synchronization</CardDescription>
           </div>
           <Link 
             to="/digital-twin"
             className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
           >
-            Manage Twin
+            Manage Virtual System
           </Link>
         </div>
       </CardHeader>
@@ -99,10 +99,10 @@ const DigitalTwinStatus = () => {
             </div>
           </div>
 
-          {/* Twin Health */}
+          {/* Virtual System Health */}
           <div>
             <div className="flex items-center justify-between">
-              <div className="text-sm font-medium">Twin Health</div>
+              <div className="text-sm font-medium">Virtual System Health</div>
               <div className="flex items-center gap-1">
                 {syncHealth >= 90 ? (
                   <CheckCircle className="h-4 w-4 text-green-500" />
@@ -125,7 +125,7 @@ const DigitalTwinStatus = () => {
         </div>
       </CardContent>
       <CardFooter className="text-xs text-gray-500">
-        Using Edge-Cloud Hybrid Twin Technology
+        Using Edge-Cloud Hybrid Virtual System Technology
       </CardFooter>
     </Card>
   );

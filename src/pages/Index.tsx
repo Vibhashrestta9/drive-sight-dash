@@ -75,7 +75,7 @@ const Index = () => {
               className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-6 py-3 rounded-xl hover:from-purple-600 hover:to-indigo-600 transition-all duration-300 shadow-lg transform hover:scale-105"
             >
               <Camera className="h-5 w-5" />
-              AR Dashboard
+              QR Code
             </Link>
           </div>
         </header>
@@ -122,7 +122,7 @@ const Index = () => {
           </div>
         </div>
         
-        {/* Digital Twin Status Section */}
+        {/* Virtual Based System Status Section */}
         <div className="mb-6 bg-gradient-to-r from-rose-100 to-pink-100 rounded-xl p-1">
           <DigitalTwinStatus />
         </div>

@@ -30,7 +30,7 @@ const ARDashboardHeader: React.FC<ARDashboardHeaderProps> = ({
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold">AR Dashboard</h1>
+          <h1 className="text-3xl font-bold">QR Code</h1>
           <p className="text-gray-600">Visualize drive data with augmented reality</p>
         </div>
       </div>
