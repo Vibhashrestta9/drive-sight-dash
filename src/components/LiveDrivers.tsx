@@ -29,43 +29,43 @@ const LiveDrivers = () => {
     const initialDrivers: Driver[] = [
       { 
         id: 1, 
-        name: 'Drive1', 
+        name: 'GIRISHA CD', 
         status: 'active', 
         location: 'Downtown', 
         lastUpdate: '2 min ago',
-        avatar: 'D1'
+        avatar: 'GC'
       },
       { 
         id: 2, 
-        name: 'Drive2', 
+        name: 'MOHAN', 
         status: 'active', 
         location: 'Highway 101', 
         lastUpdate: '5 min ago',
-        avatar: 'D2'
+        avatar: 'M'
       },
       { 
         id: 3, 
-        name: 'Drive3', 
+        name: 'BABITHA', 
         status: 'idle', 
         location: 'Central Park', 
         lastUpdate: '10 min ago',
-        avatar: 'D3'
+        avatar: 'B'
       },
       { 
         id: 4, 
-        name: 'Drive4', 
+        name: 'ANATH N', 
         status: 'offline', 
         location: 'Last: Airport Rd', 
         lastUpdate: '1 hour ago',
-        avatar: 'D4'
+        avatar: 'AN'
       },
       { 
         id: 5, 
-        name: 'Drive5', 
+        name: 'VIBHA SHRESTTA', 
         status: 'active', 
         location: 'Main Street', 
         lastUpdate: '4 min ago',
-        avatar: 'D5'
+        avatar: 'VS'
       }
     ];
 

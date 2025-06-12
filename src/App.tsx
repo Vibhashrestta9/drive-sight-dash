@@ -28,7 +28,6 @@ const App = () => (
           <Route path="/cyber-security" element={<CyberSecurity />} />
           <Route path="/export-data" element={<ExportData />} />
           <Route path="/neta21-manual" element={<Neta21Manual />} />
-          <Route path="/connect-manual" element={<Neta21Manual />} />
           <Route path="/ar-dashboard" element={<ARDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

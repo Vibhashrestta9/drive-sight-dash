@@ -5,9 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Download, Printer, Info } from 'lucide-react';
+import { Download, Printer } from 'lucide-react';
 import { RMDEDrive } from '@/utils/rmdeUtils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface DriveQRCodeGeneratorProps {
   drives: RMDEDrive[];
@@ -16,21 +15,15 @@ interface DriveQRCodeGeneratorProps {
 const DriveQRCodeGenerator: React.FC<DriveQRCodeGeneratorProps> = ({ drives }) => {
   const [selectedDrive, setSelectedDrive] = useState<string>(drives[0]?.id.toString() || '');
   
-  // Generate a simple unique code for each drive that can be easily detected
-  const generateDriveCode = (drive: RMDEDrive) => {
-    // Create a simple URL-like format that's easy to parse and scan
-    return `drivesight://drive/${drive.id}/${drive.moduleId}`;
-  };
-  
-  const downloadQRCode = (driveId: string) => {
-    const canvas = document.getElementById(`qr-${driveId}`) as HTMLElement;
+  const downloadQRCode = (driveName: string) => {
+    const canvas = document.getElementById(`qr-${driveName}`) as HTMLElement;
     const svgData = new XMLSerializer().serializeToString(canvas);
     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
     const svgUrl = URL.createObjectURL(svgBlob);
     
     const downloadLink = document.createElement('a');
     downloadLink.href = svgUrl;
-    downloadLink.download = `drive-${driveId}-QR.svg`;
+    downloadLink.download = `${driveName}-QR.svg`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
@@ -107,16 +100,18 @@ const DriveQRCodeGenerator: React.FC<DriveQRCodeGeneratorProps> = ({ drives }) =
         {drives.map((drive) => (
           <TabsContent key={drive.id.toString()} value={drive.id.toString()} className="mt-4">
             <div className="flex flex-col md:flex-row gap-6 items-center">
-              {/* QR Code - using higher quality for better scanning */}
+              {/* QR Code */}
               <div className="flex-shrink-0 border p-4 rounded-md bg-white">
                 <QRCodeSVG 
                   id={`qr-${drive.id}`}
-                  value={generateDriveCode(drive)}
-                  size={250}
-                  level="H" // Highest error correction
+                  value={JSON.stringify({
+                    id: drive.id,
+                    name: drive.name,
+                    moduleId: drive.moduleId
+                  })}
+                  size={200}
+                  level="H"
                   includeMargin={true}
-                  bgColor="#FFFFFF"
-                  fgColor="#000000"
                 />
               </div>
               
@@ -170,29 +165,11 @@ const DriveQRCodeGenerator: React.FC<DriveQRCodeGeneratorProps> = ({ drives }) =
                     <Printer className="h-4 w-4" />
                     Print QR
                   </Button>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <Info className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>These QR codes only work in the AR Dashboard</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
                 </div>
                 
-                <div className="text-sm text-gray-500 mt-2">
-                  <p className="font-semibold mb-1">Scanning Instructions:</p>
-                  <ol className="list-decimal list-inside space-y-1">
-                    <li>Print this QR code or display it on a well-lit screen</li>
-                    <li>Enable AR mode in the dashboard</li>
-                    <li>Hold your camera 8-12 inches from the QR code</li>
-                    <li>Keep the camera steady until the data appears</li>
-                    <li><span className="text-red-500 font-medium">Do NOT</span> try to open this QR code in a web browser</li>
-                  </ol>
+                <div className="text-sm text-gray-500">
+                  Print this QR code and place it on or near the physical drive.
+                  Then use the AR Dashboard to scan it and view real-time data.
                 </div>
               </div>
             </div>

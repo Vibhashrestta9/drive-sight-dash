@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -24,8 +23,8 @@ const DriverPerformance = () => {
     const driverData: DriverData[] = [
       {
         id: 1,
-        name: 'Drive1',
-        avatar: 'D1',
+        name: 'GIRISHA CD',
+        avatar: 'GC',
         safetyScore: 92,
         avgSpeed: 34,
         distanceDriven: 152,
@@ -33,8 +32,8 @@ const DriverPerformance = () => {
       },
       {
         id: 2,
-        name: 'Drive2',
-        avatar: 'D2',
+        name: 'MOHAN',
+        avatar: 'M',
         safetyScore: 88,
         avgSpeed: 38,
         distanceDriven: 134,
@@ -42,8 +41,8 @@ const DriverPerformance = () => {
       },
       {
         id: 3,
-        name: 'Drive3',
-        avatar: 'D3',
+        name: 'BABITHA',
+        avatar: 'B',
         safetyScore: 74,
         avgSpeed: 42,
         distanceDriven: 98,
@@ -51,8 +50,8 @@ const DriverPerformance = () => {
       },
       {
         id: 4,
-        name: 'Drive4',
-        avatar: 'D4',
+        name: 'ANATH N',
+        avatar: 'AN',
         safetyScore: 65,
         avgSpeed: 45,
         distanceDriven: 76,
@@ -60,8 +59,8 @@ const DriverPerformance = () => {
       },
       {
         id: 5,
-        name: 'Drive5',
-        avatar: 'D5',
+        name: 'VIBHA SHRESTTA',
+        avatar: 'VS',
         safetyScore: 95,
         avgSpeed: 32,
         distanceDriven: 186,

@@ -15,19 +15,19 @@ const generateData = (points: number): DataPoint[] => {
   const data: DataPoint[] = [];
   const now = new Date();
   
-  for (let i = 0; i <= points; i++) {
-    const time = new Date(now.getTime() - (points - i) * 60000);
+  for (let i = points; i >= 0; i--) {
+    const time = new Date(now.getTime() - i * 60000);
     const timeString = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     
     // Simulate some realistic driving data with some randomness
     let speed = 35 + Math.sin(i / 2) * 15 + (Math.random() * 10 - 5);
-    const distance = i === 0 ? 0 : data[i - 1].distance + speed / 60; // Distance traveled in last minute
+    const distance = i === points ? 0 : data[0].distance + speed / 60; // Distance traveled in last minute
     const fuel = 30 - (i / points) * 5 + (Math.random() * 2 - 1);
     
     // Clamp speed to be realistic
     speed = Math.max(0, Math.min(70, speed));
     
-    data.push({
+    data.unshift({
       time: timeString,
       speed: Math.round(speed),
       distance: parseFloat(distance.toFixed(1)),
@@ -117,51 +117,28 @@ const PerformanceGraph = () => {
           <TabsList className="mb-4">
             <TabsTrigger value="speed">Speed</TabsTrigger>
             <TabsTrigger value="distance">Distance</TabsTrigger>
-            <TabsTrigger value="fuel">Energy Efficiency</TabsTrigger>
+            <TabsTrigger value="fuel">Fuel Economy</TabsTrigger>
           </TabsList>
           <TabsContent value="speed" className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={data}
-                margin={{ top: 20, right: 30, left: 40, bottom: 60 }}
+                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis 
-                  dataKey="time" 
-                  tick={{ fontSize: 12 }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={60}
-                  interval={0}
-                  label={{ 
-                    value: 'Time', 
-                    position: 'insideBottom', 
-                    offset: -10,
-                    style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
-                  }}
-                />
-                <YAxis 
-                  tick={{ fontSize: 12 }}
-                  width={50}
-                  label={{ 
-                    value: 'Speed (m/s)', 
-                    angle: -90, 
-                    position: 'insideLeft',
-                    style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
-                  }}
-                />
+                <XAxis dataKey="time" />
+                <YAxis domain={[0, 'auto']} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc' }}
-                  formatter={(value) => [`${value} m/s`, 'Speed']}
-                  labelStyle={{ fontWeight: 'bold' }}
+                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
+                  formatter={(value) => [`${value} mph`, 'Speed']}
                 />
                 <Line
                   type="monotone"
                   dataKey="speed"
                   stroke={getChartColor()}
-                  strokeWidth={3}
-                  dot={{ r: 3, fill: getChartColor() }}
-                  activeDot={{ r: 5, fill: getChartColor() }}
+                  strokeWidth={2}
+                  dot={{ r: 2 }}
+                  activeDot={{ r: 4 }}
                   isAnimationActive={false}
                 />
               </LineChart>
@@ -171,45 +148,22 @@ const PerformanceGraph = () => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={data}
-                margin={{ top: 20, right: 30, left: 40, bottom: 60 }}
+                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis 
-                  dataKey="time" 
-                  tick={{ fontSize: 12 }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={60}
-                  interval={0}
-                  label={{ 
-                    value: 'Time', 
-                    position: 'insideBottom', 
-                    offset: -10,
-                    style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
-                  }}
-                />
-                <YAxis 
-                  tick={{ fontSize: 12 }}
-                  width={50}
-                  label={{ 
-                    value: 'Distance (m)', 
-                    angle: -90, 
-                    position: 'insideLeft',
-                    style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
-                  }}
-                />
+                <XAxis dataKey="time" />
+                <YAxis domain={[0, 'auto']} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc' }}
-                  formatter={(value) => [`${value} m`, 'Distance']}
-                  labelStyle={{ fontWeight: 'bold' }}
+                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
+                  formatter={(value) => [`${value} miles`, 'Distance']}
                 />
                 <Line
                   type="monotone"
                   dataKey="distance"
                   stroke={getChartColor()}
-                  strokeWidth={3}
-                  dot={{ r: 3, fill: getChartColor() }}
-                  activeDot={{ r: 5, fill: getChartColor() }}
+                  strokeWidth={2}
+                  dot={{ r: 2 }}
+                  activeDot={{ r: 4 }}
                   isAnimationActive={false}
                 />
               </LineChart>
@@ -219,43 +173,16 @@ const PerformanceGraph = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={data}
-                margin={{ top: 20, right: 30, left: 40, bottom: 60 }}
+                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis 
-                  dataKey="time" 
-                  tick={{ fontSize: 12 }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={60}
-                  interval={0}
-                  label={{ 
-                    value: 'Time', 
-                    position: 'insideBottom', 
-                    offset: -10,
-                    style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
-                  }}
-                />
-                <YAxis 
-                  tick={{ fontSize: 12 }}
-                  width={50}
-                  label={{ 
-                    value: 'Energy Efficiency (%)', 
-                    angle: -90, 
-                    position: 'insideLeft',
-                    style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
-                  }}
-                />
+                <XAxis dataKey="time" />
+                <YAxis domain={[0, 40]} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: '1px solid #ccc' }}
-                  formatter={(value) => [`${value}%`, 'Energy Efficiency']}
-                  labelStyle={{ fontWeight: 'bold' }}
+                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
+                  formatter={(value) => [`${value} mpg`, 'Fuel Economy']}
                 />
-                <Bar 
-                  dataKey="fuel" 
-                  fill={getChartColor()}
-                  radius={[2, 2, 0, 0]}
-                />
+                <Bar dataKey="fuel" fill={getChartColor()} />
               </BarChart>
             </ResponsiveContainer>
           </TabsContent>

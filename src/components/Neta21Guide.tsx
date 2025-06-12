@@ -11,7 +11,7 @@ const Neta21Guide = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Network className="h-6 w-6" />
-          CONNECT Connection Guide
+          NETA-21 Connection Guide
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -20,12 +20,12 @@ const Neta21Guide = () => {
           <div className="rounded-lg border p-4">
             <h3 className="font-medium flex items-center gap-2 mb-3">
               <LogIn className="h-5 w-5" />
-              Logging into CONNECT
+              Logging into NETA-21
             </h3>
             <ol className="list-decimal ml-5 space-y-2">
               <li>Ensure RMDE-01 is powered on</li>
-              <li>Press and hold CONNECT SD/RJ45 button for 5 seconds</li>
-              <li>Connect Ethernet cable between CONNECT ETH1 port and PC</li>
+              <li>Press and hold NETA-21 SD/RJ45 button for 5 seconds</li>
+              <li>Connect Ethernet cable between NETA-21 ETH1 port and PC</li>
               <li>Navigate to <span className="font-mono bg-slate-100 px-2 py-0.5 rounded">https://192.168.230.1</span></li>
               <li>Default credentials:
                 <ul className="list-disc ml-6 mt-1">
@@ -45,7 +45,7 @@ const Neta21Guide = () => {
               Cloud Connection Status
             </h3>
             <ol className="list-decimal ml-5 space-y-2">
-              <li>Check connectivity status on CONNECT portal front page</li>
+              <li>Check connectivity status on NETA-21 portal front page</li>
               <li>View data sent to cloud:
                 <ul className="list-disc ml-6 mt-1">
                   <li>Go to Navigation window</li>
@@ -88,7 +88,7 @@ const Neta21Guide = () => {
               <li>Required information:
                 <ul className="list-disc ml-6 mt-1">
                   <li>Customer and site details</li>
-                  <li>CONNECT and RMDE-01 serial numbers</li>
+                  <li>NETA-21 and RMDE-01 serial numbers</li>
                   <li>Connected drives details</li>
                 </ul>
               </li>

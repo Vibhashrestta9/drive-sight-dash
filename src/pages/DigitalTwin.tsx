@@ -93,7 +93,7 @@ const DigitalTwin = () => {
   const handleReset = () => {
     resetTwin();
     toast({
-      title: "Virtual Based System reset",
+      title: "Digital Twin reset",
       description: "All models restored to normal operation",
     });
   };
@@ -106,7 +106,7 @@ const DigitalTwin = () => {
             <Link to="/" className="text-gray-600 hover:text-gray-900">
               <ArrowLeft className="h-5 w-5" />
             </Link>
-            <h1 className="text-3xl font-bold text-gray-900">Virtual Based System Management</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Digital Twin Management</h1>
           </div>
           <p className="text-gray-600">Edge-Cloud hybrid model synchronization and management</p>
         </header>
@@ -116,7 +116,7 @@ const DigitalTwin = () => {
           {/* Status Panel */}
           <Card className="md:col-span-2">
             <CardHeader>
-              <CardTitle>Virtual System Status</CardTitle>
+              <CardTitle>Twin Status</CardTitle>
               <CardDescription>Current state of edge and cloud models</CardDescription>
             </CardHeader>
             <CardContent>
@@ -225,7 +225,7 @@ const DigitalTwin = () => {
                   onClick={handleReset}
                   variant="outline"
                 >
-                  Reset Virtual System Status
+                  Reset Twin Status
                 </Button>
               </div>
             </CardContent>
@@ -234,7 +234,7 @@ const DigitalTwin = () => {
           {/* Health Summary */}
           <Card>
             <CardHeader>
-              <CardTitle>Virtual System Health</CardTitle>
+              <CardTitle>Twin Health</CardTitle>
               <CardDescription>Overall system integrity</CardDescription>
             </CardHeader>
             <CardContent>
@@ -279,7 +279,7 @@ const DigitalTwin = () => {
               <Separator className="my-4" />
               
               <div className="text-sm text-gray-600">
-                <div className="font-medium mb-2">Recent Virtual System Events:</div>
+                <div className="font-medium mb-2">Recent Twin Events:</div>
                 <div className="space-y-1">
                   <div>• Cloud sync completed (2 mins ago)</div>
                   <div>• Model parameters updated (5 mins ago)</div>
@@ -290,7 +290,7 @@ const DigitalTwin = () => {
           </Card>
         </div>
         
-        {/* Tabs for Virtual System Data */}
+        {/* Tabs for Twin Data */}
         <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="mb-6">
           <TabsList className="mb-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -300,10 +300,10 @@ const DigitalTwin = () => {
           
           <TabsContent value="overview">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Virtual System Architecture */}
+              {/* Twin Architecture */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Virtual System Architecture</CardTitle>
+                  <CardTitle>Twin Architecture</CardTitle>
                   <CardDescription>Edge-Cloud hybrid processing model</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -351,7 +351,7 @@ const DigitalTwin = () => {
                 </CardContent>
               </Card>
               
-              {/* Virtual System Data Flow */}
+              {/* Twin Data Flow */}
               <Card>
                 <CardHeader>
                   <CardTitle>Data Flow Summary</CardTitle>
@@ -407,7 +407,7 @@ const DigitalTwin = () => {
           <TabsContent value="parameters">
             <Card>
               <CardHeader>
-                <CardTitle>Virtual System Parameters</CardTitle>
+                <CardTitle>Twin Parameters</CardTitle>
                 <CardDescription>Synchronized data points between edge and cloud</CardDescription>
               </CardHeader>
               <CardContent>
@@ -458,7 +458,7 @@ const DigitalTwin = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Synchronization Configuration</CardTitle>
-                <CardDescription>Configure how and when virtual system models are synchronized</CardDescription>
+                <CardDescription>Configure how and when twin models are synchronized</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { InfoIcon, ChartLine } from 'lucide-react';
-import { RMDEDrive } from '@/utils/types/rmdeTypes';
+import { RMDEDrive } from '@/utils/rmdeUtils';
 import { 
   calculateDHI, 
   getDHIStatus, 
