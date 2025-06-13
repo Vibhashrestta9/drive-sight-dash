@@ -9,29 +9,6 @@ export interface ARSceneProps {
   drives: RMDEDrive[];
 }
 
-const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
-  // This would be your QR code target image
-  const targetFile = "qr-target.zpt";
-  
-  return (
-    <>
-      <ZapparCamera />
-      <directionalLight position={[0, 5, 10]} intensity={1.0} />
-      <ambientLight intensity={0.5} />
-      
-      {/* Multiple trackers for each drive QR code */}
-      {drives.map((drive) => (
-        <ImageTracker
-          key={drive.id.toString()}
-          targetImage={targetFile}
-        >
-          <DriveModel drive={drive} />
-        </ImageTracker>
-      ))}
-    </>
-  );
-};
-
 // Component for displaying a drive in AR
 const DriveModel = ({ drive }: { drive: RMDEDrive }) => {
   const boxRef = useRef<THREE.Mesh>(null);
@@ -133,6 +110,29 @@ const DriveModel = ({ drive }: { drive: RMDEDrive }) => {
         </Html>
       </Billboard>
     </group>
+  );
+};
+
+const ARScene = ({ drives }: ARSceneProps) => {
+  // This would be your QR code target image
+  const targetFile = "qr-target.zpt";
+  
+  return (
+    <>
+      <ZapparCamera />
+      <directionalLight position={[0, 5, 10]} intensity={1.0} />
+      <ambientLight intensity={0.5} />
+      
+      {/* Multiple trackers for each drive QR code */}
+      {drives.map((drive) => (
+        <ImageTracker
+          key={drive.id.toString()}
+          targetImage={targetFile}
+        >
+          <DriveModel drive={drive} />
+        </ImageTracker>
+      ))}
+    </>
   );
 };
 
