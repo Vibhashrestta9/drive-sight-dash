@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Text, Box, Stats } from '@react-three/drei';
@@ -15,18 +16,8 @@ import { generateInitialRMDEData, updateRMDEData, RMDEDrive } from '@/utils/rmde
 import SelfHealingSystem from '@/components/SelfHealingSystem';
 import DriveQRCodeGenerator from '@/components/DriveQRCodeGenerator';
 
-// Simple lazy loading without complex typing
-const LazyARScene = React.lazy(() => import('@/components/ar/ARScene'));
-
-// Wrapper component to handle props properly
-const ARSceneWrapper = ({ drives }: { drives: RMDEDrive[] }) => {
-  return <LazyARScene drives={drives} />;
-};
-
-// Define the ARScene props interface
-interface ARSceneProps {
-  drives: RMDEDrive[];
-}
+// Import ARScene directly instead of lazy loading to avoid TypeScript issues
+import ARScene from '@/components/ar/ARScene';
 
 // For fallback non-AR mode
 function StandardView({ drives }: { drives: RMDEDrive[] }) {
@@ -228,11 +219,9 @@ const ARDashboard = () => {
         <TabsContent value="ar" className="mt-4">
           {arMode ? (
             <div className="h-[600px] rounded-lg overflow-hidden border border-gray-200">
-              <Suspense fallback={<div className="flex h-full w-full items-center justify-center">Loading AR capabilities...</div>}>
-                <ZapparCanvas>
-                  <ARSceneWrapper drives={rmdeData} />
-                </ZapparCanvas>
-              </Suspense>
+              <ZapparCanvas>
+                <ARScene drives={rmdeData} />
+              </ZapparCanvas>
             </div>
           ) : (
             <div className="flex h-64 items-center justify-center">
