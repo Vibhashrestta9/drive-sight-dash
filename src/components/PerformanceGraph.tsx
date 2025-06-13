@@ -1,194 +1,370 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar, ComposedChart, Area, AreaChart } from 'recharts';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { TrendingUp, TrendingDown, Activity, Gauge, Route, Zap, Clock } from 'lucide-react';
 
-interface DataPoint {
+interface PerformanceData {
   time: string;
+  timeNumeric: number;
   speed: number;
   distance: number;
-  fuel: number;
+  efficiency: number;
+  operatingHours: number;
+  temperature: number;
+  powerUsage: number;
+  healthScore: number;
 }
 
-const generateData = (points: number): DataPoint[] => {
-  const data: DataPoint[] = [];
-  const now = new Date();
-  
-  for (let i = points; i >= 0; i--) {
-    const time = new Date(now.getTime() - i * 60000);
-    const timeString = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
-    // Simulate some realistic driving data with some randomness
-    let speed = 35 + Math.sin(i / 2) * 15 + (Math.random() * 10 - 5);
-    const distance = i === points ? 0 : data[0].distance + speed / 60; // Distance traveled in last minute
-    const fuel = 30 - (i / points) * 5 + (Math.random() * 2 - 1);
-    
-    // Clamp speed to be realistic
-    speed = Math.max(0, Math.min(70, speed));
-    
-    data.unshift({
-      time: timeString,
-      speed: Math.round(speed),
-      distance: parseFloat(distance.toFixed(1)),
-      fuel: parseFloat(fuel.toFixed(1)),
-    });
-  }
-  
-  return data;
+const chartConfig = {
+  speed: {
+    label: "Speed",
+    color: "hsl(var(--chart-1))",
+  },
+  distance: {
+    label: "Distance",
+    color: "hsl(var(--chart-2))",
+  },
+  efficiency: {
+    label: "Efficiency",
+    color: "hsl(var(--chart-3))",
+  },
+  operatingHours: {
+    label: "Operating Hours",
+    color: "hsl(var(--chart-4))",
+  },
+  temperature: {
+    label: "Temperature",
+    color: "hsl(var(--chart-5))",
+  },
+  powerUsage: {
+    label: "Power Usage",
+    color: "hsl(var(--primary))",
+  },
+  healthScore: {
+    label: "Health Score",
+    color: "hsl(var(--chart-1))",
+  },
 };
 
 const PerformanceGraph = () => {
-  const [activeTab, setActiveTab] = useState('speed');
-  const [data, setData] = useState<DataPoint[]>(generateData(10));
-  
+  const [performanceData, setPerformanceData] = useState<PerformanceData[]>([]);
+  const [activeMetric, setActiveMetric] = useState('speed');
+
+  // Generate initial data and update periodically
   useEffect(() => {
-    // Update data every minute to simulate live updates
-    const interval = setInterval(() => {
-      setData(prevData => {
-        const newData = [...prevData.slice(1)];
-        const lastPoint = newData[newData.length - 1];
-        const now = new Date();
-        
-        let newSpeed = lastPoint.speed + (Math.random() * 10 - 5);
-        newSpeed = Math.max(0, Math.min(70, newSpeed));
-        
-        const newDistance = lastPoint.distance + newSpeed / 60;
-        const newFuel = lastPoint.fuel - 0.1 * (newSpeed / 30) + (Math.random() * 0.4 - 0.2);
-        
-        newData.push({
-          time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          speed: Math.round(newSpeed),
-          distance: parseFloat(newDistance.toFixed(1)),
-          fuel: parseFloat(Math.max(0, newFuel).toFixed(1)),
+    const generateData = () => {
+      const data: PerformanceData[] = [];
+      const now = new Date();
+      
+      for (let i = 23; i >= 0; i--) {
+        const time = new Date(now.getTime() - i * 60 * 60 * 1000);
+        data.push({
+          time: time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+          timeNumeric: 24 - i,
+          speed: Math.floor(Math.random() * 30) + 40, // 40-70 mph
+          distance: Math.floor(Math.random() * 50) + 100, // 100-150 miles
+          efficiency: Math.floor(Math.random() * 20) + 80, // 80-100%
+          operatingHours: Math.floor(Math.random() * 5) + (24 - i), // Incremental hours
+          temperature: Math.floor(Math.random() * 20) + 45, // 45-65°C
+          powerUsage: Math.floor(Math.random() * 100) + 200, // 200-300W
+          healthScore: Math.floor(Math.random() * 20) + 80, // 80-100%
         });
-        
+      }
+      return data;
+    };
+
+    setPerformanceData(generateData());
+
+    // Update data every 30 seconds
+    const interval = setInterval(() => {
+      setPerformanceData(prev => {
+        const newData = [...prev.slice(1)];
+        const lastTime = new Date();
+        newData.push({
+          time: lastTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+          timeNumeric: newData.length + 1,
+          speed: Math.floor(Math.random() * 30) + 40,
+          distance: Math.floor(Math.random() * 50) + 100,
+          efficiency: Math.floor(Math.random() * 20) + 80,
+          operatingHours: (newData[newData.length - 1]?.operatingHours || 0) + 1,
+          temperature: Math.floor(Math.random() * 20) + 45,
+          powerUsage: Math.floor(Math.random() * 100) + 200,
+          healthScore: Math.floor(Math.random() * 20) + 80,
+        });
         return newData;
       });
-    }, 60000);
-    
+    }, 30000);
+
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    // Simulate smaller updates every 10 seconds to make the chart more dynamic
-    const smallUpdateInterval = setInterval(() => {
-      setData(prevData => {
-        const newData = [...prevData];
-        const lastIndex = newData.length - 1;
-        
-        // Just update the latest point slightly to simulate real-time changes
-        let newSpeed = newData[lastIndex].speed + (Math.random() * 4 - 2);
-        newSpeed = Math.max(0, Math.min(70, newSpeed));
-        
-        newData[lastIndex] = {
-          ...newData[lastIndex],
-          speed: Math.round(newSpeed),
-        };
-        
-        return [...newData];
-      });
-    }, 10000);
-    
-    return () => clearInterval(smallUpdateInterval);
-  }, []);
-
-  const getChartColor = () => {
-    switch (activeTab) {
+  const getMetricInfo = (metric: string) => {
+    switch (metric) {
       case 'speed':
-        return '#2563eb'; // Blue
+        return {
+          title: 'Drive Speed Performance',
+          description: 'Real-time speed monitoring across all drives',
+          icon: <Gauge className="h-4 w-4" />,
+          unit: 'mph',
+          yAxisLabel: 'Speed (mph)',
+          color: chartConfig.speed.color
+        };
       case 'distance':
-        return '#10b981'; // Green
-      case 'fuel':
-        return '#f59e0b'; // Amber
+        return {
+          title: 'Distance Traveled',
+          description: 'Cumulative distance covered by drives',
+          icon: <Route className="h-4 w-4" />,
+          unit: 'mi',
+          yAxisLabel: 'Distance (miles)',
+          color: chartConfig.distance.color
+        };
+      case 'efficiency':
+        return {
+          title: 'Energy Efficiency',
+          description: 'Drive efficiency metrics over time',
+          icon: <Zap className="h-4 w-4" />,
+          unit: '%',
+          yAxisLabel: 'Efficiency (%)',
+          color: chartConfig.efficiency.color
+        };
+      case 'operatingHours':
+        return {
+          title: 'Operating Hours',
+          description: 'Total operational time tracking',
+          icon: <Clock className="h-4 w-4" />,
+          unit: 'hrs',
+          yAxisLabel: 'Hours',
+          color: chartConfig.operatingHours.color
+        };
       default:
-        return '#2563eb';
+        return {
+          title: 'Performance Metrics',
+          description: 'Drive performance data',
+          icon: <Activity className="h-4 w-4" />,
+          unit: '',
+          yAxisLabel: 'Value',
+          color: chartConfig.speed.color
+        };
     }
   };
 
+  const getCurrentValue = () => {
+    if (performanceData.length === 0) return 0;
+    const latest = performanceData[performanceData.length - 1];
+    return latest[activeMetric as keyof PerformanceData] as number;
+  };
+
+  const getPreviousValue = () => {
+    if (performanceData.length < 2) return 0;
+    const previous = performanceData[performanceData.length - 2];
+    return previous[activeMetric as keyof PerformanceData] as number;
+  };
+
+  const getTrend = () => {
+    const current = getCurrentValue();
+    const previous = getPreviousValue();
+    const change = current - previous;
+    const percentage = previous !== 0 ? Math.abs((change / previous) * 100) : 0;
+    
+    return {
+      direction: change > 0 ? 'up' : 'down',
+      percentage: percentage.toFixed(1)
+    };
+  };
+
+  const metricInfo = getMetricInfo(activeMetric);
+  const trend = getTrend();
+
   return (
-    <Card className="col-span-1 lg:col-span-2">
-      <CardHeader>
-        <CardTitle>Driving Performance</CardTitle>
-        <CardDescription>Live driving metrics over time</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="speed" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-4">
-            <TabsTrigger value="speed">Speed</TabsTrigger>
-            <TabsTrigger value="distance">Distance</TabsTrigger>
-            <TabsTrigger value="fuel">Fuel Economy</TabsTrigger>
-          </TabsList>
-          <TabsContent value="speed" className="h-[300px]">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {['speed', 'distance', 'efficiency', 'operatingHours'].map((metric) => {
+          const info = getMetricInfo(metric);
+          const isActive = activeMetric === metric;
+          const value = performanceData.length > 0 ? 
+            performanceData[performanceData.length - 1][metric as keyof PerformanceData] : 0;
+          
+          return (
+            <Card 
+              key={metric}
+              className={`cursor-pointer transition-all hover:shadow-md ${isActive ? 'ring-2 ring-primary' : ''}`}
+              onClick={() => setActiveMetric(metric)}
+            >
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">
+                  {info.title.replace('Drive ', '').replace('Energy ', '')}
+                </CardTitle>
+                {info.icon}
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {typeof value === 'number' ? value.toFixed(0) : '0'}{info.unit}
+                </div>
+                <Badge variant={isActive ? "default" : "secondary"} className="mt-2">
+                  {isActive ? 'Active' : 'View'}
+                </Badge>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {metricInfo.icon}
+              <CardTitle>{metricInfo.title}</CardTitle>
+            </div>
+            <div className="flex items-center gap-2">
+              {trend.direction === 'up' ? (
+                <TrendingUp className="h-4 w-4 text-green-500" />
+              ) : (
+                <TrendingDown className="h-4 w-4 text-red-500" />
+              )}
+              <span className={`text-sm ${trend.direction === 'up' ? 'text-green-500' : 'text-red-500'}`}>
+                {trend.percentage}%
+              </span>
+            </div>
+          </div>
+          <CardDescription>{metricInfo.description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer config={chartConfig} className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={data}
-                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis dataKey="time" />
-                <YAxis domain={[0, 'auto']} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
-                  formatter={(value) => [`${value} mph`, 'Speed']}
+              <LineChart data={performanceData} margin={{ top: 20, right: 30, left: 60, bottom: 60 }}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis 
+                  dataKey="time" 
+                  className="text-xs"
+                  tick={{ fontSize: 12 }}
+                  label={{ 
+                    value: 'Time (Hours)', 
+                    position: 'insideBottom', 
+                    offset: -10,
+                    style: { textAnchor: 'middle', fontSize: '14px', fontWeight: 'bold' }
+                  }}
+                />
+                <YAxis 
+                  className="text-xs"
+                  tick={{ fontSize: 12 }}
+                  label={{ 
+                    value: metricInfo.yAxisLabel, 
+                    angle: -90, 
+                    position: 'insideLeft',
+                    style: { textAnchor: 'middle', fontSize: '14px', fontWeight: 'bold' }
+                  }}
+                />
+                <ChartTooltip 
+                  content={<ChartTooltipContent />}
+                  labelFormatter={(value) => `Time: ${value}`}
                 />
                 <Line
                   type="monotone"
-                  dataKey="speed"
-                  stroke={getChartColor()}
-                  strokeWidth={2}
-                  dot={{ r: 2 }}
-                  activeDot={{ r: 4 }}
-                  isAnimationActive={false}
+                  dataKey={activeMetric}
+                  stroke={metricInfo.color}
+                  strokeWidth={3}
+                  dot={{ fill: metricInfo.color, strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: metricInfo.color, strokeWidth: 2 }}
                 />
               </LineChart>
             </ResponsiveContainer>
-          </TabsContent>
-          <TabsContent value="distance" className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={data}
-                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis dataKey="time" />
-                <YAxis domain={[0, 'auto']} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
-                  formatter={(value) => [`${value} miles`, 'Distance']}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="distance"
-                  stroke={getChartColor()}
-                  strokeWidth={2}
-                  dot={{ r: 2 }}
-                  activeDot={{ r: 4 }}
-                  isAnimationActive={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </TabsContent>
-          <TabsContent value="fuel" className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={data}
-                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis dataKey="time" />
-                <YAxis domain={[0, 40]} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: '8px' }}
-                  formatter={(value) => [`${value} mpg`, 'Fuel Economy']}
-                />
-                <Bar dataKey="fuel" fill={getChartColor()} />
-              </BarChart>
-            </ResponsiveContainer>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-4 w-4" />
+              Efficiency Comparison
+            </CardTitle>
+            <CardDescription>Current vs Previous Period</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig} className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={performanceData.slice(-12)} margin={{ top: 20, right: 30, left: 40, bottom: 60 }}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis 
+                    dataKey="time" 
+                    tick={{ fontSize: 10 }}
+                    label={{ 
+                      value: 'Time Period', 
+                      position: 'insideBottom', 
+                      offset: -10,
+                      style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
+                    }}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 12 }}
+                    label={{ 
+                      value: 'Efficiency (%)', 
+                      angle: -90, 
+                      position: 'insideLeft',
+                      style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
+                    }}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="efficiency" fill={chartConfig.efficiency.color} radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Operating Hours Trend
+            </CardTitle>
+            <CardDescription>Cumulative operational time</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig} className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={performanceData.slice(-12)} margin={{ top: 20, right: 30, left: 40, bottom: 60 }}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis 
+                    dataKey="time" 
+                    tick={{ fontSize: 10 }}
+                    label={{ 
+                      value: 'Time Period', 
+                      position: 'insideBottom', 
+                      offset: -10,
+                      style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
+                    }}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 12 }}
+                    label={{ 
+                      value: 'Operating Hours', 
+                      angle: -90, 
+                      position: 'insideLeft',
+                      style: { textAnchor: 'middle', fontSize: '12px', fontWeight: 'bold' }
+                    }}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Area
+                    type="monotone"
+                    dataKey="operatingHours"
+                    stroke={chartConfig.operatingHours.color}
+                    fill={chartConfig.operatingHours.color}
+                    fillOpacity={0.3}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 };
 
