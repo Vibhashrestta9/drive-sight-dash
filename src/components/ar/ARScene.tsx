@@ -80,7 +80,7 @@ const DriveModel = ({ drive }: { drive: RMDEDrive }) => {
       
       {/* Name label */}
       <Billboard position={[0, 0.85, 0]}>
-        <Text fontSize={0.15} color="#ffffff" backgroundColor="#000000" paddingX={0.05}>
+        <Text fontSize={0.15} color="#ffffff">
           {drive.name}
         </Text>
       </Billboard>
