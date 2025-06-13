@@ -21,13 +21,17 @@ const DriveModel = ({ drive }: { drive: RMDEDrive }) => {
     if (drive.status === 'error') {
       const interval = setInterval(() => {
         if (boxRef.current) {
-          boxRef.current.scale.x = 1 + Math.sin(Date.now() * 0.005) * 0.1;
-          boxRef.current.scale.y = 1 + Math.sin(Date.now() * 0.005) * 0.1;
-          boxRef.current.scale.z = 1 + Math.sin(Date.now() * 0.005) * 0.1;
+          const scale = 1 + Math.sin(Date.now() * 0.005) * 0.1;
+          boxRef.current.scale.setScalar(scale);
         }
       }, 16);
       
       return () => clearInterval(interval);
+    } else {
+      // Reset scale when not in error state
+      if (boxRef.current) {
+        boxRef.current.scale.setScalar(1);
+      }
     }
   }, [drive.status]);
   
@@ -87,11 +91,11 @@ const DriveModel = ({ drive }: { drive: RMDEDrive }) => {
                 width: `${drive.healthScore}%`, 
                 height: '6px', 
                 backgroundColor: getHealthColor(),
-                borderRadius: '3px',
+                border: '3px',
               }}></div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px' }}>
-              <div>Temp: {drive.temperature}°C</div>
+              <div>Temp: {drive.temp}°C</div>
               <div>Power: {drive.powerUsage}W</div>
               <div>Eff: {drive.efficiency}%</div>
               <div>Runtime: {Math.floor(drive.operatingHours)}h</div>
@@ -113,7 +117,7 @@ const DriveModel = ({ drive }: { drive: RMDEDrive }) => {
   );
 };
 
-const ARScene = ({ drives }: ARSceneProps) => {
+const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
   // This would be your QR code target image
   const targetFile = "qr-target.zpt";
   
