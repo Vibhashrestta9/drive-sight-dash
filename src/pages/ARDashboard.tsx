@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Text, Box, Stats } from '@react-three/drei';
@@ -21,10 +20,8 @@ interface ARSceneProps {
   drives: RMDEDrive[];
 }
 
-// Properly type the lazy-loaded component
-const LazyARScene = React.lazy((): Promise<{ default: React.ComponentType<ARSceneProps> }> => 
-  import('@/components/ar/ARScene')
-);
+// Simple lazy loading without complex typing
+const LazyARScene = React.lazy(() => import('@/components/ar/ARScene'));
 
 // For fallback non-AR mode
 function StandardView({ drives }: { drives: RMDEDrive[] }) {
@@ -228,7 +225,7 @@ const ARDashboard = () => {
             <div className="h-[600px] rounded-lg overflow-hidden border border-gray-200">
               <Suspense fallback={<div className="flex h-full w-full items-center justify-center">Loading AR capabilities...</div>}>
                 <ZapparCanvas>
-                  <LazyARScene drives={rmdeData} />
+                  <LazyARScene {...({ drives: rmdeData } as ARSceneProps)} />
                 </ZapparCanvas>
               </Suspense>
             </div>
