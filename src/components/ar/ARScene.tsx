@@ -91,11 +91,11 @@ const DriveModel = ({ drive }: { drive: RMDEDrive }) => {
                 width: `${drive.healthScore}%`, 
                 height: '6px', 
                 backgroundColor: getHealthColor(),
-                border: '3px',
+                borderRadius: '3px',
               }}></div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px' }}>
-              <div>Temp: {drive.temp}°C</div>
+              <div>Temp: {drive.temperature}°C</div>
               <div>Power: {drive.powerUsage}W</div>
               <div>Eff: {drive.efficiency}%</div>
               <div>Runtime: {Math.floor(drive.operatingHours)}h</div>
@@ -117,7 +117,7 @@ const DriveModel = ({ drive }: { drive: RMDEDrive }) => {
   );
 };
 
-const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
+const ARScene = ({ drives }: ARSceneProps) => {
   // This would be your QR code target image
   const targetFile = "qr-target.zpt";
   
