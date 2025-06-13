@@ -20,7 +20,7 @@ const DriveQRCodeGenerator = () => {
   const [customConfig, setCustomConfig] = useState<string>('');
   const [showAdvanced, setShowAdvanced] = useState(false);
   
-  // Updated drive configurations with new naming convention
+  // Drive configurations with sequential naming
   const drives: DriveConfig[] = [
     {
       id: 'drive-1',
