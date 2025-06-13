@@ -20,8 +20,8 @@ interface ARSceneProps {
   drives: RMDEDrive[];
 }
 
-// Simple lazy loading without complex typing
-const LazyARScene = React.lazy(() => import('@/components/ar/ARScene'));
+// Properly typed lazy loading
+const LazyARScene = React.lazy(() => import('@/components/ar/ARScene')) as React.LazyExoticComponent<React.ComponentType<ARSceneProps>>;
 
 // For fallback non-AR mode
 function StandardView({ drives }: { drives: RMDEDrive[] }) {
@@ -225,7 +225,7 @@ const ARDashboard = () => {
             <div className="h-[600px] rounded-lg overflow-hidden border border-gray-200">
               <Suspense fallback={<div className="flex h-full w-full items-center justify-center">Loading AR capabilities...</div>}>
                 <ZapparCanvas>
-                  <LazyARScene {...({ drives: rmdeData } as ARSceneProps)} />
+                  <LazyARScene drives={rmdeData} />
                 </ZapparCanvas>
               </Suspense>
             </div>
