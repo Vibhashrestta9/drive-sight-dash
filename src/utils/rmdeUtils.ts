@@ -45,10 +45,10 @@ interface RMDESystemStatus {
  * Generates initial mock RMDE drive data
  */
 export const generateInitialRMDEData = (): RMDEDrive[] => {
-  const moduleIds = ['NETA-21-A', 'NETA-21-B', 'NETA-21-C'];
+  const moduleIds = ['Connect21-A', 'Connect21-B', 'Connect21-C'];
   const driveNames = [
-    'GIRISHA CD', 'MOHAN', 'BABITHA', 
-    'ANATH N', 'VIBHA SHRESTTA'
+    'Drive 1', 'Drive 2', 'Drive 3', 
+    'Drive 4', 'Drive 5'
   ];
   
   return driveNames.map((name, index) => {
@@ -212,10 +212,10 @@ export const getHealthColor = (score: number): string => {
 };
 
 /**
- * Generate mock NETA-21 modules data
+ * Generate mock Connect21 modules data
  */
 export const generateNETAModules = (): RMDEModule[] => {
-  const moduleIds = ['NETA-21-A', 'NETA-21-B', 'NETA-21-C'];
+  const moduleIds = ['Connect21-A', 'Connect21-B', 'Connect21-C'];
   
   return moduleIds.map((id, index) => {
     const ipOctet = 100 + index;
