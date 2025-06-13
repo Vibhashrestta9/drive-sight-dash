@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Text, Box, Stats } from '@react-three/drei';
@@ -16,8 +15,8 @@ import { generateInitialRMDEData, updateRMDEData, RMDEDrive } from '@/utils/rmde
 import SelfHealingSystem from '@/components/SelfHealingSystem';
 import DriveQRCodeGenerator from '@/components/DriveQRCodeGenerator';
 
-// Import ARScene directly instead of lazy loading to avoid TypeScript issues
-import ARScene from '@/components/ar/ARScene';
+// Import ARScene with proper typing
+import ARScene, { ARSceneProps } from '@/components/ar/ARScene';
 
 // For fallback non-AR mode
 function StandardView({ drives }: { drives: RMDEDrive[] }) {
