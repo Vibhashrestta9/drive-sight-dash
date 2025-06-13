@@ -5,7 +5,7 @@ import { Text, Box, Billboard, Html } from '@react-three/drei';
 import { RMDEDrive } from '@/utils/rmdeUtils';
 import * as THREE from 'three';
 
-interface ARSceneProps {
+export interface ARSceneProps {
   drives: RMDEDrive[];
 }
 
