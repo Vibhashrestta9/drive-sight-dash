@@ -15,13 +15,18 @@ import { generateInitialRMDEData, updateRMDEData, RMDEDrive } from '@/utils/rmde
 import SelfHealingSystem from '@/components/SelfHealingSystem';
 import DriveQRCodeGenerator from '@/components/DriveQRCodeGenerator';
 
+// Simple lazy loading without complex typing
+const LazyARScene = React.lazy(() => import('@/components/ar/ARScene'));
+
+// Wrapper component to handle props properly
+const ARSceneWrapper = ({ drives }: { drives: RMDEDrive[] }) => {
+  return <LazyARScene drives={drives} />;
+};
+
 // Define the ARScene props interface
 interface ARSceneProps {
   drives: RMDEDrive[];
 }
-
-// Properly typed lazy loading
-const LazyARScene = React.lazy(() => import('@/components/ar/ARScene')) as React.LazyExoticComponent<React.ComponentType<ARSceneProps>>;
 
 // For fallback non-AR mode
 function StandardView({ drives }: { drives: RMDEDrive[] }) {
@@ -225,7 +230,7 @@ const ARDashboard = () => {
             <div className="h-[600px] rounded-lg overflow-hidden border border-gray-200">
               <Suspense fallback={<div className="flex h-full w-full items-center justify-center">Loading AR capabilities...</div>}>
                 <ZapparCanvas>
-                  <LazyARScene drives={rmdeData} />
+                  <ARSceneWrapper drives={rmdeData} />
                 </ZapparCanvas>
               </Suspense>
             </div>
