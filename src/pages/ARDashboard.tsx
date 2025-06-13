@@ -15,8 +15,8 @@ import { generateInitialRMDEData, updateRMDEData, RMDEDrive } from '@/utils/rmde
 import SelfHealingSystem from '@/components/SelfHealingSystem';
 import DriveQRCodeGenerator from '@/components/DriveQRCodeGenerator';
 
-// This is for AR mode
-const ARScene = React.lazy(() => import('@/components/ar/ARScene'));
+// This is for AR mode - properly typed lazy import
+const ARScene = React.lazy(() => import('@/components/ar/ARScene')) as React.LazyExoticComponent<React.ComponentType<{ drives: RMDEDrive[] }>>;
 
 // For fallback non-AR mode
 function StandardView({ drives }: { drives: RMDEDrive[] }) {
