@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { ZapparCamera, ImageTracker } from '@zappar/zappar-react-three-fiber';
 import { Text, Box, Billboard, Html } from '@react-three/drei';
@@ -117,7 +116,7 @@ const DriveModel = ({ drive }: { drive: RMDEDrive }) => {
   );
 };
 
-const ARScene = ({ drives }: ARSceneProps) => {
+const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
   // This would be your QR code target image
   const targetFile = "qr-target.zpt";
   
