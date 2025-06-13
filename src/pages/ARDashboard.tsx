@@ -21,7 +21,7 @@ interface ARSceneProps {
 }
 
 // This is for AR mode - properly typed lazy import
-const ARScene = React.lazy(() => import('@/components/ar/ARScene')) as React.LazyExoticComponent<React.ComponentType<ARSceneProps>>;
+const ARScene = React.lazy(() => import('@/components/ar/ARScene'));
 
 // For fallback non-AR mode
 function StandardView({ drives }: { drives: RMDEDrive[] }) {
