@@ -15,8 +15,8 @@ import { generateInitialRMDEData, updateRMDEData, RMDEDrive } from '@/utils/rmde
 import SelfHealingSystem from '@/components/SelfHealingSystem';
 import DriveQRCodeGenerator from '@/components/DriveQRCodeGenerator';
 
-// Import ARScene with proper typing
-import ARScene, { ARSceneProps } from '@/components/ar/ARScene';
+// Import ARScene
+import ARScene from '@/components/ar/ARScene';
 
 // For fallback non-AR mode
 function StandardView({ drives }: { drives: RMDEDrive[] }) {
@@ -202,7 +202,7 @@ const ARDashboard = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <DriveQRCodeGenerator drives={rmdeData} />
+            <DriveQRCodeGenerator />
           </CardContent>
         </Card>
       )}

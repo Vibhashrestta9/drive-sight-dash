@@ -116,7 +116,7 @@ const DriveModel = ({ drive }: { drive: RMDEDrive }) => {
   );
 };
 
-const ARScene: React.FC<ARSceneProps> = ({ drives }) => {
+const ARScene = ({ drives }: ARSceneProps) => {
   // This would be your QR code target image
   const targetFile = "qr-target.zpt";
   
